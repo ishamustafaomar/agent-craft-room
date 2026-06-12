@@ -89,18 +89,61 @@ function WorkspaceInner({
     Object.keys(initialFiles).sort()[0] ?? null,
   );
   const [terminal, setTerminal] = useState<string[]>([]);
+  const [wcStatus, setWcStatus] = useState<WCStatus>("idle");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [supported, setSupported] = useState(false);
 
   const filesRef = useRef<FileMap>(initialFiles);
   filesRef.current = files;
 
+  const managerRef = useRef<WebContainerManager | null>(null);
+
+  const appendTerminal = (chunk: string) =>
+    setTerminal((t) => [...t.slice(-400), chunk]);
+
+  // Lazily load the WebContainer manager on the client only (it touches browser
+  // globals and must never run during SSR).
+  useEffect(() => {
+    let cancelled = false;
+    import("@/lib/execution/webcontainer-manager").then((m) => {
+      if (cancelled) return;
+      managerRef.current = m.getWebContainerManager();
+      setSupported(m.WebContainerManager.isSupported());
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleStart() {
+    setTerminal([]);
+    setPreviewUrl(null);
+    if (!managerRef.current) {
+      const m = await import("@/lib/execution/webcontainer-manager");
+      managerRef.current = m.getWebContainerManager();
+    }
+    managerRef.current.start(filesRef.current, {
+      onOutput: appendTerminal,
+      onStatus: (s) => setWcStatus(s),
+      onServerReady: (url) => setPreviewUrl(url),
+    });
+  }
+
   const runtime = useMemo(
     () =>
-      createDbRuntime(projectId, filesRef, (next) => {
-        setFiles(next);
-        setSelectedPath((cur) => cur ?? Object.keys(next).sort()[0] ?? null);
-      }),
+      createWorkspaceRuntime(
+        projectId,
+        filesRef,
+        (next) => {
+          setFiles(next);
+          setSelectedPath((cur) => cur ?? Object.keys(next).sort()[0] ?? null);
+        },
+        () => managerRef.current,
+        appendTerminal,
+      ),
     [projectId],
   );
+
 
   return (
     <div className="flex h-screen flex-col bg-background">
