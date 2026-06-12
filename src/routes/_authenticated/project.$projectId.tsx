@@ -144,6 +144,29 @@ function WorkspaceInner({
     [projectId],
   );
 
+  function handleCreateFile(path: string) {
+    runtime.writeFile(path, "");
+    setSelectedPath(path);
+  }
+
+  function handleDeleteFile(path: string) {
+    runtime.deleteFile(path);
+    setSelectedPath((cur) => (cur === path ? null : cur));
+  }
+
+  function handleRenameFile(oldPath: string, newPath: string) {
+    const content = filesRef.current[oldPath] ?? "";
+    runtime.writeFile(newPath, content);
+    runtime.deleteFile(oldPath);
+    setSelectedPath(newPath);
+  }
+
+  function handleSaveFile(path: string, content: string) {
+    runtime.writeFile(path, content);
+  }
+
+
+
 
   return (
     <div className="flex h-screen flex-col bg-background">
