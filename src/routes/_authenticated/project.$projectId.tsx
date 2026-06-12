@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { UIMessage } from "ai";
@@ -9,8 +9,12 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { getProject } from "@/lib/projects.functions";
-import { createDbRuntime } from "@/lib/execution/db-runtime";
+import { createWorkspaceRuntime } from "@/lib/execution/workspace-runtime";
 import type { FileMap } from "@/lib/execution/types";
+import type {
+  WCStatus,
+  WebContainerManager,
+} from "@/lib/execution/webcontainer-manager";
 import { ChatPanel } from "@/components/workspace/chat-panel";
 import { FileExplorer } from "@/components/workspace/file-explorer";
 import { PreviewPanel } from "@/components/workspace/preview-panel";
