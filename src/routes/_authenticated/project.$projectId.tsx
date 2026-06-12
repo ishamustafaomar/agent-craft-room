@@ -171,7 +171,6 @@ function WorkspaceInner({
             runtime={runtime}
             initialMessages={initialMessages}
             getFileTree={() => Object.keys(filesRef.current).sort().join("\n")}
-            onCommandOutput={(chunk) => setTerminal((t) => [...t, chunk])}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
