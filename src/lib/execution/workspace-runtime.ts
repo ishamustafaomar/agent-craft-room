@@ -32,7 +32,7 @@ export function createWorkspaceRuntime(
       commit({ ...filesRef.current, [path]: content });
       await Promise.all([
         upsertFile({ data: { projectId, path, content } }),
-        getManager().writeFile(path, content),
+        getManager()?.writeFile(path, content) ?? Promise.resolve(),
       ]);
     },
     async deleteFile(path) {
@@ -41,7 +41,7 @@ export function createWorkspaceRuntime(
       commit(next);
       await Promise.all([
         deleteFileFn({ data: { projectId, path } }),
-        getManager().deleteFile(path),
+        getManager()?.deleteFile(path) ?? Promise.resolve(),
       ]);
     },
     async runCommand(command, onOutput) {
@@ -49,7 +49,14 @@ export function createWorkspaceRuntime(
         onOutput?.(chunk);
         onCommandOutput?.(chunk);
       };
-      return getManager().runCommand(command, sink);
+      const manager = getManager();
+      if (!manager) {
+        const msg = `$ ${command}\n[skipped] Start the live sandbox first.`;
+        sink(msg);
+        return { output: msg, exitCode: 0 };
+      }
+      return manager.runCommand(command, sink);
     },
+
   };
 }
