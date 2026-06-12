@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { UIMessage } from "ai";
@@ -9,8 +9,12 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { getProject } from "@/lib/projects.functions";
-import { createDbRuntime } from "@/lib/execution/db-runtime";
+import { createWorkspaceRuntime } from "@/lib/execution/workspace-runtime";
 import type { FileMap } from "@/lib/execution/types";
+import type {
+  WCStatus,
+  WebContainerManager,
+} from "@/lib/execution/webcontainer-manager";
 import { ChatPanel } from "@/components/workspace/chat-panel";
 import { FileExplorer } from "@/components/workspace/file-explorer";
 import { PreviewPanel } from "@/components/workspace/preview-panel";
@@ -85,18 +89,61 @@ function WorkspaceInner({
     Object.keys(initialFiles).sort()[0] ?? null,
   );
   const [terminal, setTerminal] = useState<string[]>([]);
+  const [wcStatus, setWcStatus] = useState<WCStatus>("idle");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [supported, setSupported] = useState(false);
 
   const filesRef = useRef<FileMap>(initialFiles);
   filesRef.current = files;
 
+  const managerRef = useRef<WebContainerManager | null>(null);
+
+  const appendTerminal = (chunk: string) =>
+    setTerminal((t) => [...t.slice(-400), chunk]);
+
+  // Lazily load the WebContainer manager on the client only (it touches browser
+  // globals and must never run during SSR).
+  useEffect(() => {
+    let cancelled = false;
+    import("@/lib/execution/webcontainer-manager").then((m) => {
+      if (cancelled) return;
+      managerRef.current = m.getWebContainerManager();
+      setSupported(m.WebContainerManager.isSupported());
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleStart() {
+    setTerminal([]);
+    setPreviewUrl(null);
+    if (!managerRef.current) {
+      const m = await import("@/lib/execution/webcontainer-manager");
+      managerRef.current = m.getWebContainerManager();
+    }
+    managerRef.current.start(filesRef.current, {
+      onOutput: appendTerminal,
+      onStatus: (s) => setWcStatus(s),
+      onServerReady: (url) => setPreviewUrl(url),
+    });
+  }
+
   const runtime = useMemo(
     () =>
-      createDbRuntime(projectId, filesRef, (next) => {
-        setFiles(next);
-        setSelectedPath((cur) => cur ?? Object.keys(next).sort()[0] ?? null);
-      }),
+      createWorkspaceRuntime(
+        projectId,
+        filesRef,
+        (next) => {
+          setFiles(next);
+          setSelectedPath((cur) => cur ?? Object.keys(next).sort()[0] ?? null);
+        },
+        () => managerRef.current,
+        appendTerminal,
+      ),
     [projectId],
   );
+
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -124,7 +171,6 @@ function WorkspaceInner({
             runtime={runtime}
             initialMessages={initialMessages}
             getFileTree={() => Object.keys(filesRef.current).sort().join("\n")}
-            onCommandOutput={(chunk) => setTerminal((t) => [...t, chunk])}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
@@ -137,7 +183,14 @@ function WorkspaceInner({
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={32} minSize={20}>
-          <PreviewPanel files={files} terminal={terminal} />
+          <PreviewPanel
+            files={files}
+            terminal={terminal}
+            status={wcStatus}
+            previewUrl={previewUrl}
+            supported={supported}
+            onStart={handleStart}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
