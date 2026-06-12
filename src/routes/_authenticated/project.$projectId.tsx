@@ -16,7 +16,7 @@ import type {
   WebContainerManager,
 } from "@/lib/execution/webcontainer-manager";
 import { ChatPanel } from "@/components/workspace/chat-panel";
-import { FileExplorer } from "@/components/workspace/file-explorer";
+import { EditorPanel } from "@/components/workspace/editor-panel";
 import { PreviewPanel } from "@/components/workspace/preview-panel";
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 
