@@ -13,7 +13,7 @@ export function createWorkspaceRuntime(
   projectId: string,
   filesRef: { current: FileMap },
   onChange: (files: FileMap) => void,
-  getManager: () => WebContainerManager,
+  getManager: () => WebContainerManager | null,
   onCommandOutput?: (chunk: string) => void,
 ): Runtime {
   function commit(next: FileMap) {
