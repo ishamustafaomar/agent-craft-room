@@ -37,6 +37,26 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Messages are required", { status: 400 });
         }
 
+        // Require an authenticated user — this endpoint spends AI credits.
+        const authHeader = request.headers.get("authorization") ?? "";
+        const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+        if (!token) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+        if (!supabaseUrl || !supabaseKey) {
+          return new Response("Server not configured", { status: 500 });
+        }
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabase = createClient(supabaseUrl, supabaseKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+        const { data: userData, error: userError } = await supabase.auth.getUser(token);
+        if (userError || !userData.user) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         const key = process.env.LOVABLE_API_KEY;
         if (!key) {
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
