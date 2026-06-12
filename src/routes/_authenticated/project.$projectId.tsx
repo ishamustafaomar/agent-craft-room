@@ -197,15 +197,19 @@ function WorkspaceInner({
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={36} minSize={22}>
-          <FileExplorer
+        <ResizablePanel defaultSize={40} minSize={28}>
+          <EditorPanel
             files={files}
             selectedPath={selectedPath}
             onSelect={setSelectedPath}
+            onCreateFile={handleCreateFile}
+            onDeleteFile={handleDeleteFile}
+            onRenameFile={handleRenameFile}
+            onSave={handleSaveFile}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={32} minSize={20}>
+        <ResizablePanel defaultSize={28} minSize={18}>
           <PreviewPanel
             files={files}
             terminal={terminal}
@@ -216,6 +220,7 @@ function WorkspaceInner({
           />
         </ResizablePanel>
       </ResizablePanelGroup>
+
     </div>
   );
 }
