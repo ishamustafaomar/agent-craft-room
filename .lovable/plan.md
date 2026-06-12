@@ -49,12 +49,12 @@ Goal: the agent's file operations actually run.
 Deliverable: prompt → agent edits files → npm runs in-browser → live preview updates (on the published / cross-origin-isolated site).
 
 
-## Stage 3 — Full 3-Panel IDE
-- Layout: Chat (left), Monaco multi-file editor + file-explorer tree (center), Live preview + terminal tabs (right). Resizable panes, dark theme.
-- Monaco editor with open tabs, dirty state, save → WebContainer + DB.
-- File explorer: create/rename/delete, reflecting the virtual FS.
-- Terminal panel showing streamed command output; manual command input.
-- Smooth animations, minimal modern dark UI using the design system.
+## Stage 3 — Full 3-Panel IDE ✅ DONE
+- Layout: Chat (left), file-tree + Monaco editor (center), live preview + terminal tabs (right). All panes resizable, dark theme.
+- Monaco editor (`code-editor.tsx`): multi-file tabs, dirty indicators, Ctrl/Cmd+S + Save button → writes to runtime (DB + container HMR), language detection by extension, agent edits reflected live in open non-dirty tabs.
+- File tree (`file-tree.tsx`): nested collapsible folders, new file, inline rename, delete (confirm dialog) — all backed by the workspace runtime.
+- Terminal panel streams command output; preview lifecycle controls (start/restart/reload/open).
+
 
 ## Stage 4 — App Lifecycle + Templates
 - Dashboard: create project from prompt, list/load existing projects, delete.
