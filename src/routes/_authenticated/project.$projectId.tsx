@@ -184,7 +184,14 @@ function WorkspaceInner({
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={32} minSize={20}>
-          <PreviewPanel files={files} terminal={terminal} />
+          <PreviewPanel
+            files={files}
+            terminal={terminal}
+            status={wcStatus}
+            previewUrl={previewUrl}
+            supported={supported}
+            onStart={handleStart}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
