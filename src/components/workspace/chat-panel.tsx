@@ -8,6 +8,7 @@ import {
 import { executeAgentTool } from "@/lib/execution/tool-executor";
 import type { Runtime } from "@/lib/execution/types";
 import { saveMessages, updateChatSummary } from "@/lib/projects.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
