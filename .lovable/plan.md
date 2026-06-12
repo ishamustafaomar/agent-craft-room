@@ -38,16 +38,16 @@ Goal: a working streaming AI agent with tool calls that produce file operations,
 
 Deliverable: type a prompt, watch the agent stream reasoning and emit file-write tool calls saved to the DB. No editor/preview yet.
 
-## Stage 2 — In-Browser Execution + Live Preview (WebContainers)
+## Stage 2 — In-Browser Execution + Live Preview (WebContainers) ✅ DONE
 Goal: the agent's file operations actually run.
 
-- Add a WebContainer execution adapter (`src/lib/execution/`) behind a `FileSystem` interface so the agent layer stays decoupled.
-- On project open: boot a WebContainer, hydrate it from `project_files`, run install, start the dev server, show it in a sandboxed iframe.
-- Wire agent tool calls (`write_file`/`run_command`/etc.) to the WebContainer FS + process API; stream stdout/stderr to a terminal panel.
-- Sync changes back to `project_files` (debounced) for persistence.
-- Note: WebContainers require specific COOP/COEP cross-origin-isolation headers; we set those on the workspace route.
+- Added `@webcontainer/api` and a `WebContainerManager` singleton (`src/lib/execution/webcontainer-manager.ts`): boot, mount (flat map → file tree), per-file write/delete mirroring, streamed `npm install` + `npm run dev`, `server-ready` → preview URL.
+- `createWorkspaceRuntime` (`src/lib/execution/workspace-runtime.ts`) replaces the Stage 1 db-runtime: every agent file op persists to `project_files` AND mirrors into the live container (HMR); `run_command` routes to the container with streamed output; long-running serve commands are owned by the preview panel.
+- Preview panel: "Start preview" boots the sandbox, shows status (booting/installing/starting/ready), live iframe, reload + open-in-new-tab, restart, and a streamed terminal tab.
+- COOP/COEP cross-origin isolation: set via request middleware in `src/start.ts` (production runtime) and `vite preview` headers. The Lovable editor sandbox strips dev headers, so the panel detects `window.crossOriginIsolated` and shows a graceful fallback there; live preview activates on the published site.
 
-Deliverable: prompt → agent edits files → npm runs → live preview updates.
+Deliverable: prompt → agent edits files → npm runs in-browser → live preview updates (on the published / cross-origin-isolated site).
+
 
 ## Stage 3 — Full 3-Panel IDE
 - Layout: Chat (left), Monaco multi-file editor + file-explorer tree (center), Live preview + terminal tabs (right). Resizable panes, dark theme.
