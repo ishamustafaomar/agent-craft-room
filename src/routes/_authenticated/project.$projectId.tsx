@@ -1,0 +1,145 @@
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import type { UIMessage } from "ai";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { getProject } from "@/lib/projects.functions";
+import { createDbRuntime } from "@/lib/execution/db-runtime";
+import type { FileMap } from "@/lib/execution/types";
+import { ChatPanel } from "@/components/workspace/chat-panel";
+import { FileExplorer } from "@/components/workspace/file-explorer";
+import { PreviewPanel } from "@/components/workspace/preview-panel";
+import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated/project/$projectId")({
+  component: Workspace,
+});
+
+const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
+function Workspace() {
+  const { projectId } = useParams({ from: "/_authenticated/project/$projectId" });
+  const getProjectFn = useServerFn(getProject);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["project", projectId],
+    queryFn: () => getProjectFn({ data: { projectId } }),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background">
+        <p className="text-muted-foreground">Could not load this project.</p>
+        <Link to="/dashboard" className="text-sm text-primary hover:underline">
+          Back to dashboard
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <WorkspaceInner
+      projectId={projectId}
+      projectName={data.project.name}
+      template={data.project.template}
+      initialFiles={Object.fromEntries(data.files.map((f) => [f.path, f.content]))}
+      initialMessages={data.messages.map(
+        (m): UIMessage => ({
+          id: m.message_id || m.id,
+          role: m.role as UIMessage["role"],
+          parts: (m.parts as UIMessage["parts"]) ?? [],
+        }),
+      )}
+    />
+  );
+}
+
+function WorkspaceInner({
+  projectId,
+  projectName,
+  template,
+  initialFiles,
+  initialMessages,
+}: {
+  projectId: string;
+  projectName: string;
+  template: string;
+  initialFiles: FileMap;
+  initialMessages: UIMessage[];
+}) {
+  const [files, setFiles] = useState<FileMap>(initialFiles);
+  const [selectedPath, setSelectedPath] = useState<string | null>(
+    Object.keys(initialFiles).sort()[0] ?? null,
+  );
+  const [terminal, setTerminal] = useState<string[]>([]);
+
+  const filesRef = useRef<FileMap>(initialFiles);
+  filesRef.current = files;
+
+  const runtime = useMemo(
+    () =>
+      createDbRuntime(projectId, filesRef, (next) => {
+        setFiles(next);
+        setSelectedPath((cur) => cur ?? Object.keys(next).sort()[0] ?? null);
+      }),
+    [projectId],
+  );
+
+  return (
+    <div className="flex h-screen flex-col bg-background">
+      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border px-4">
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <Sparkles className="h-4 w-4 text-primary" />
+        <span className="text-sm font-medium">{projectName}</span>
+        <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+          {template}
+        </span>
+      </header>
+
+      <ResizablePanelGroup orientation="horizontal" className="flex-1">
+        <ResizablePanel defaultSize={32} minSize={22}>
+          <ChatPanel
+            projectId={projectId}
+            projectName={projectName}
+            template={template}
+            model={DEFAULT_MODEL}
+            runtime={runtime}
+            initialMessages={initialMessages}
+            getFileTree={() => Object.keys(filesRef.current).sort().join("\n")}
+            onCommandOutput={(chunk) => setTerminal((t) => [...t, chunk])}
+          />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={36} minSize={22}>
+          <FileExplorer
+            files={files}
+            selectedPath={selectedPath}
+            onSelect={setSelectedPath}
+          />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={32} minSize={20}>
+          <PreviewPanel files={files} terminal={terminal} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
+  );
+}
