@@ -16,7 +16,7 @@ import type {
   WebContainerManager,
 } from "@/lib/execution/webcontainer-manager";
 import { ChatPanel } from "@/components/workspace/chat-panel";
-import { FileExplorer } from "@/components/workspace/file-explorer";
+import { EditorPanel } from "@/components/workspace/editor-panel";
 import { PreviewPanel } from "@/components/workspace/preview-panel";
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 
@@ -144,6 +144,29 @@ function WorkspaceInner({
     [projectId],
   );
 
+  function handleCreateFile(path: string) {
+    runtime.writeFile(path, "");
+    setSelectedPath(path);
+  }
+
+  function handleDeleteFile(path: string) {
+    runtime.deleteFile(path);
+    setSelectedPath((cur) => (cur === path ? null : cur));
+  }
+
+  function handleRenameFile(oldPath: string, newPath: string) {
+    const content = filesRef.current[oldPath] ?? "";
+    runtime.writeFile(newPath, content);
+    runtime.deleteFile(oldPath);
+    setSelectedPath(newPath);
+  }
+
+  function handleSaveFile(path: string, content: string) {
+    runtime.writeFile(path, content);
+  }
+
+
+
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -174,15 +197,19 @@ function WorkspaceInner({
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={36} minSize={22}>
-          <FileExplorer
+        <ResizablePanel defaultSize={40} minSize={28}>
+          <EditorPanel
             files={files}
             selectedPath={selectedPath}
             onSelect={setSelectedPath}
+            onCreateFile={handleCreateFile}
+            onDeleteFile={handleDeleteFile}
+            onRenameFile={handleRenameFile}
+            onSave={handleSaveFile}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={32} minSize={20}>
+        <ResizablePanel defaultSize={28} minSize={18}>
           <PreviewPanel
             files={files}
             terminal={terminal}
@@ -193,6 +220,7 @@ function WorkspaceInner({
           />
         </ResizablePanel>
       </ResizablePanelGroup>
+
     </div>
   );
 }
