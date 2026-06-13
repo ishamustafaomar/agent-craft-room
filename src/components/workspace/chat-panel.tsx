@@ -46,6 +46,7 @@ export function ChatPanel({
   getAiRules,
   onExitPlan,
   onCommandOutput,
+  onTurnSettled,
 }: ChatPanelProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
