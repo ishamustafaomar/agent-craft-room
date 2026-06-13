@@ -8,7 +8,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { getProject, touchProject } from "@/lib/projects.functions";
+import { getProject, touchProject, createSnapshot } from "@/lib/projects.functions";
 import { createWorkspaceRuntime } from "@/lib/execution/workspace-runtime";
 import type { FileMap } from "@/lib/execution/types";
 import type {
