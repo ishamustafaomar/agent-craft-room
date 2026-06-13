@@ -131,9 +131,8 @@ function Dashboard() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <span className="font-semibold tracking-tight">Forge AI</span>
+          <Link to="/dashboard" className="flex items-center">
+            <BrandLogo size={26} />
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
