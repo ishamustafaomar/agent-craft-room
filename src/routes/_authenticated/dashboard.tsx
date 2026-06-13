@@ -131,16 +131,16 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
+    <div className="min-h-screen bg-breezy-mesh text-[oklch(0.22_0.03_280)]">
+      <header className="border-b border-[oklch(0.22_0.03_280/0.1)] bg-white/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/dashboard" className="flex items-center">
             <BrandLogo size={26} />
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <Button variant="ghost" size="sm" className="gap-2 hover:bg-white/50">
+                <span className="text-sm text-[oklch(0.4_0.03_280)]">{user?.email}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -160,10 +160,10 @@ function Dashboard() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         {/* Build-from-prompt hero */}
         <section className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)] sm:text-4xl">
             What do you want to build?
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-[oklch(0.4_0.03_280)]">
             Describe your app and the agent will scaffold it and start building.
           </p>
 
