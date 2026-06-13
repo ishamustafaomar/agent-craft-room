@@ -168,3 +168,17 @@
     color: var(--color-foreground);
   }
 }
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-serif-display);
+  }
+
+  .bg-breezy-mesh {
+    background-image: var(--gradient-breezy);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+}
