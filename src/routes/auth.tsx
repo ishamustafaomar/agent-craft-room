@@ -121,18 +121,19 @@ function AuthPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="name">Display name</Label>
+                <Label htmlFor="name" className="text-[oklch(0.3_0.03_280)]">Display name</Label>
                 <Input
                   id="name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Ada Lovelace"
                   autoComplete="name"
+                  className="border-[oklch(0.22_0.03_280/0.15)] bg-white/80 text-[oklch(0.22_0.03_280)] placeholder:text-[oklch(0.55_0.03_280)]"
                 />
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-[oklch(0.3_0.03_280)]">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -141,10 +142,11 @@ function AuthPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
+                className="border-[oklch(0.22_0.03_280/0.15)] bg-white/80 text-[oklch(0.22_0.03_280)] placeholder:text-[oklch(0.55_0.03_280)]"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[oklch(0.3_0.03_280)]">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -154,15 +156,16 @@ function AuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                className="border-[oklch(0.22_0.03_280/0.15)] bg-white/80 text-[oklch(0.22_0.03_280)] placeholder:text-[oklch(0.55_0.03_280)]"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full shadow-soft" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {mode === "signin" ? "Sign in" : "Create account"}
             </Button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm text-[oklch(0.4_0.03_280)]">
             {mode === "signin" ? "No account yet?" : "Already have an account?"}{" "}
             <button
               type="button"
