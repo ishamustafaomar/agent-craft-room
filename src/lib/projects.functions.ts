@@ -115,6 +115,62 @@ export const deleteProject = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// Bump updated_at so the dashboard surfaces most-recently-opened projects first.
+export const touchProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ projectId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("projects")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", data.projectId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// Clone a project (metadata + all files) into a fresh project owned by the user.
+export const duplicateProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ projectId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: source, error: srcError } = await supabase
+      .from("projects")
+      .select("name, template")
+      .eq("id", data.projectId)
+      .single();
+    if (srcError || !source) throw new Error(srcError?.message ?? "Project not found");
+
+    const { data: copy, error: insError } = await supabase
+      .from("projects")
+      .insert({
+        name: `${source.name} (copy)`.slice(0, 120),
+        template: source.template,
+        user_id: userId,
+      })
+      .select("id, name, template, chat_summary, created_at, updated_at")
+      .single();
+    if (insError || !copy) throw new Error(insError?.message ?? "Failed to duplicate project");
+
+    const { data: files, error: filesError } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId);
+    if (filesError) throw new Error(filesError.message);
+
+    if (files && files.length > 0) {
+      const rows = files.map((f) => ({
+        project_id: copy.id,
+        path: f.path,
+        content: f.content,
+      }));
+      const { error: copyFilesError } = await supabase.from("project_files").insert(rows);
+      if (copyFilesError) throw new Error(copyFilesError.message);
+    }
+    return copy;
+  });
+
 // ---------- Files ----------
 
 export const upsertFile = createServerFn({ method: "POST" })
