@@ -207,7 +207,7 @@ function Dashboard() {
               </button>
             ))}
             <TemplateGallery
-              onSelect={(templateId) =>
+              onSelect={(templateId: string) =>
                 createMut.mutate({
                   name: deriveName(prompt) === "Untitled App" ? TEMPLATES[templateId]?.name ?? "Untitled App" : deriveName(prompt),
                   template: templateId,
