@@ -104,7 +104,7 @@ function Landing() {
 
       <footer className="border-t border-border">
         <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground">
-          Forge AI — your AI coding agent.
+          Breezy — vibe-code beautiful apps in minutes.
         </div>
       </footer>
     </div>
