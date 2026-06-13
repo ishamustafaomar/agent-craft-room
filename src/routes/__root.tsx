@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Breezy is the friendliest AI builder for shipping web apps. Describe it, see it, ship it — all in your browser." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@BreezyAI" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
