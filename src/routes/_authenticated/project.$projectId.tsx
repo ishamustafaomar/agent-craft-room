@@ -98,7 +98,7 @@ function Workspace() {
       initialMessages={initialMessages}
       // Only auto-run the prompt for a brand-new project with no history yet.
       initialPrompt={initialMessages.length === 0 ? prompt : undefined}
-    />>
+    />
   );
 }
 
