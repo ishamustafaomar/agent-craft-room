@@ -336,6 +336,10 @@ function WorkspaceInner({
             onRestore={handleRestoreFiles}
           />
           <ShareDialog projectId={projectId} initialPublic={initialPublic} />
+          <GithubExport
+            getFiles={() => filesRef.current}
+            defaultRepo={projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "breezy-app"}
+          />
           <Button
             variant="outline"
             size="sm"
