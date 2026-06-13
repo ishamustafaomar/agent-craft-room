@@ -15,6 +15,11 @@ export const Route = createFileRoute("/p/$projectId")({
         content: "A web app built and shared with Breezy — the friendliest AI builder.",
       },
       { property: "og:title", content: "Built with Breezy" },
+      {
+        property: "og:description",
+        content:
+          "Explore a live, read-only web app built and shared with Breezy — the friendliest AI builder. Describe it, see it, ship it.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -35,9 +40,9 @@ function PublicProject() {
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-border px-4">
         <div className="flex items-center gap-2">
           <BrandLogo size={20} showWordmark={false} />
-          <span className="text-sm font-medium">
+          <h1 className="text-sm font-medium">
             {data?.project?.name ?? "Shared app"}
-          </span>
+          </h1>
         </div>
         <Link
           to="/"

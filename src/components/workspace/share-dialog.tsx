@@ -82,11 +82,22 @@ export function ShareDialog({
         {isPublic && (
           <div className="flex items-center gap-2">
             <Input readOnly value={shareUrl} className="text-xs" />
-            <Button size="icon" variant="outline" className="h-9 w-9 shrink-0" onClick={copy}>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-9 w-9 shrink-0"
+              onClick={copy}
+              aria-label="Copy share link"
+            >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
             <a href={shareUrl} target="_blank" rel="noreferrer">
-              <Button size="icon" variant="outline" className="h-9 w-9 shrink-0">
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-9 w-9 shrink-0"
+                aria-label="Open share link in new tab"
+              >
                 <ExternalLink className="h-4 w-4" />
               </Button>
             </a>
