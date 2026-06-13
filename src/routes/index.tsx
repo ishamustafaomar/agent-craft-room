@@ -27,7 +27,9 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "The friendliest AI builder for shipping web apps. Describe it, see it, ship it.",
       },
+      { property: "og:url", content: "https://breezyai.dev/" },
     ],
+    links: [{ rel: "canonical", href: "https://breezyai.dev/" }],
   }),
   component: Landing,
 });
