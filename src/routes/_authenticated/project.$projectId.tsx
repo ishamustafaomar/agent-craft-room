@@ -123,6 +123,23 @@ function WorkspaceInner({
   const [supported, setSupported] = useState(false);
   const [exporting, setExporting] = useState(false);
 
+  // Per-project agent mode (build/ask/plan), persisted in the browser.
+  const modeStorageKey = `forge:mode:${projectId}`;
+  const [agentMode, setAgentMode] = useState<"build" | "ask" | "plan">(() => {
+    if (typeof window === "undefined") return "build";
+    const saved = window.localStorage.getItem(modeStorageKey);
+    return saved === "ask" || saved === "plan" ? saved : "build";
+  });
+
+  function handleModeChange(next: "build" | "ask" | "plan") {
+    setAgentMode(next);
+    try {
+      window.localStorage.setItem(modeStorageKey, next);
+    } catch {
+      /* ignore storage failures */
+    }
+  }
+
   // Per-project model selection, persisted in the browser.
   const modelStorageKey = `forge:model:${projectId}`;
   const [model, setModel] = useState<string>(() => {
