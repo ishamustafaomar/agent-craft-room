@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -8,7 +8,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { getProject } from "@/lib/projects.functions";
+import { getProject, touchProject } from "@/lib/projects.functions";
 import { createWorkspaceRuntime } from "@/lib/execution/workspace-runtime";
 import type { FileMap } from "@/lib/execution/types";
 import type {
@@ -21,6 +21,9 @@ import { PreviewPanel } from "@/components/workspace/preview-panel";
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    prompt: typeof search.prompt === "string" ? search.prompt : undefined,
+  }),
   component: Workspace,
 });
 
@@ -28,12 +31,20 @@ const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
 function Workspace() {
   const { projectId } = useParams({ from: "/_authenticated/project/$projectId" });
+  const { prompt } = useSearch({ from: "/_authenticated/project/$projectId" });
   const getProjectFn = useServerFn(getProject);
+  const touchProjectFn = useServerFn(touchProject);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => getProjectFn({ data: { projectId } }),
   });
+
+  // Mark this project as most-recently-opened for dashboard ordering.
+  useEffect(() => {
+    touchProjectFn({ data: { projectId } }).catch(() => {});
+  }, [projectId, touchProjectFn]);
+
 
   if (isLoading) {
     return (
