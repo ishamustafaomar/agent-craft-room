@@ -54,6 +54,13 @@ export const runCommandSchema = z.object({
   command: z.string().min(1).describe("Shell command to run, e.g. 'npm install'."),
 });
 
+export const scaffoldBackendSchema = z.object({
+  features: z
+    .array(z.enum(["auth", "database"]))
+    .min(1)
+    .describe("Which capabilities to scaffold: 'auth' (login/signup) and/or 'database' (CRUD store)."),
+});
+
 export const setChatSummarySchema = z.object({
   summary: z.string().min(1).max(80).describe("A short title for this conversation turn."),
 });
