@@ -15,16 +15,16 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Forge AI — Build full-stack apps by chatting with an AI agent" },
+      { title: "Breezy — Vibe-code beautiful apps in minutes" },
       {
         name: "description",
         content:
-          "Forge AI is an AI coding agent that turns prompts into working full-stack apps. Chat, generate files, run commands, and preview live.",
+          "Breezy is the friendliest AI builder for shipping web apps. Describe it, see it, ship it — files, commands, and a live preview in your browser.",
       },
-      { property: "og:title", content: "Forge AI — AI coding agent" },
+      { property: "og:title", content: "Breezy — Vibe-code beautiful apps in minutes" },
       {
         property: "og:description",
-        content: "Turn prompts into working full-stack apps with a real AI coding agent.",
+        content: "The friendliest AI builder for shipping web apps. Describe it, see it, ship it.",
       },
     ],
   }),
