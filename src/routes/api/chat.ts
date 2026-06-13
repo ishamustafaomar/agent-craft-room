@@ -114,7 +114,7 @@ export const Route = createFileRoute("/api/chat")({
           }),
           onError: (error) => {
             console.error("[chat] stream error", error);
-            return "The AI agent ran into an error. Please try again.";
+            return describeStreamError(error);
           },
         });
 
