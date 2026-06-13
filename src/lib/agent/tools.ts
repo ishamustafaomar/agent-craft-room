@@ -54,6 +54,13 @@ export const runCommandSchema = z.object({
   command: z.string().min(1).describe("Shell command to run, e.g. 'npm install'."),
 });
 
+export const scaffoldBackendSchema = z.object({
+  features: z
+    .array(z.enum(["auth", "database"]))
+    .min(1)
+    .describe("Which capabilities to scaffold: 'auth' (login/signup) and/or 'database' (CRUD store)."),
+});
+
 export const setChatSummarySchema = z.object({
   summary: z.string().min(1).max(80).describe("A short title for this conversation turn."),
 });
@@ -157,6 +164,11 @@ const allTools = {
       "Run a shell command in the project sandbox (e.g. npm install, npm run build). Output is captured. Destructive commands are blocked.",
     inputSchema: runCommandSchema,
   }),
+  scaffold_backend: tool({
+    description:
+      "Add a working in-browser backend to the generated app: a localStorage-backed data store and/or a simple auth layer (signup, login, logout, current user). Writes src/lib/breezy-backend.ts with typed helpers that run live in the preview. Use this when the user asks to add login, accounts, or to save/persist data.",
+    inputSchema: scaffoldBackendSchema,
+  }),
   write_plan: tool({
     description:
       "Present (or update) an implementation plan for the user to review. Plan mode only.",
@@ -193,6 +205,7 @@ const BUILD_TOOLS: AgentToolName[] = [
   "delete_file",
   "add_dependency",
   "run_command",
+  "scaffold_backend",
   "write_app_blueprint",
 ];
 

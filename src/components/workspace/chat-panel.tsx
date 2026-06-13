@@ -30,6 +30,7 @@ interface ChatPanelProps {
   getAiRules: () => string;
   onExitPlan?: () => void;
   onCommandOutput?: (chunk: string) => void;
+  onTurnSettled?: () => void;
 }
 
 export function ChatPanel({
@@ -45,6 +46,7 @@ export function ChatPanel({
   getAiRules,
   onExitPlan,
   onCommandOutput,
+  onTurnSettled,
 }: ChatPanelProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -128,9 +130,10 @@ export function ChatPanel({
     }));
     const timer = setTimeout(() => {
       saveMessages({ data: { projectId, messages: rows } }).catch(() => {});
+      onTurnSettled?.();
     }, 600);
     return () => clearTimeout(timer);
-  }, [status, messages, projectId]);
+  }, [status, messages, projectId, onTurnSettled]);
 
   function submitPrompt(text: string) {
     sendMessage(

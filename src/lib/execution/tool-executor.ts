@@ -185,7 +185,118 @@ export async function executeAgentTool(
       // Blueprint card is rendered from the tool part; user approves to proceed.
       return { ok: true };
     }
+    case "scaffold_backend": {
+      const features = Array.isArray(args.features)
+        ? (args.features as string[])
+        : ["database"];
+      const content = buildBackendModule(features);
+      await runtime.writeFile("src/lib/breezy-backend.ts", content);
+      return {
+        ok: true,
+        path: "src/lib/breezy-backend.ts",
+        features,
+        usage:
+          "Import from '@/lib/breezy-backend' or a relative path. " +
+          (features.includes("auth")
+            ? "auth.signUp(email,password), auth.signIn(email,password), auth.signOut(), auth.currentUser(). "
+            : "") +
+          (features.includes("database")
+            ? "db.list(collection), db.insert(collection,row), db.update(collection,id,patch), db.remove(collection,id)."
+            : ""),
+      };
+    }
     default:
       return { error: `Unknown tool: ${toolName}` };
   }
+}
+
+// Generates a self-contained, localStorage-backed backend module for a generated
+// app so auth + CRUD work live in the WebContainer preview (no server needed).
+function buildBackendModule(features: string[]): string {
+  const wantAuth = features.includes("auth");
+  const wantDb = features.includes("database");
+  const parts: string[] = [
+    "// Breezy in-browser backend — generated. Persists to localStorage so it",
+    "// works entirely in the preview. Swap for a real backend before shipping.",
+    "",
+    "function read<T>(key: string, fallback: T): T {",
+    "  try {",
+    "    const raw = localStorage.getItem(key);",
+    "    return raw ? (JSON.parse(raw) as T) : fallback;",
+    "  } catch {",
+    "    return fallback;",
+    "  }",
+    "}",
+    "",
+    "function write(key: string, value: unknown) {",
+    "  localStorage.setItem(key, JSON.stringify(value));",
+    "}",
+    "",
+    "function uid() {",
+    "  return Math.random().toString(36).slice(2) + Date.now().toString(36);",
+    "}",
+    "",
+  ];
+
+  if (wantDb) {
+    parts.push(
+      "export type Row = { id: string; createdAt: number; [key: string]: unknown };",
+      "",
+      "export const db = {",
+      "  list<T extends Row = Row>(collection: string): T[] {",
+      "    return read<T[]>(`breezy:db:${collection}`, []);",
+      "  },",
+      "  insert<T extends Row = Row>(collection: string, row: Omit<T, 'id' | 'createdAt'>): T {",
+      "    const items = db.list<T>(collection);",
+      "    const record = { ...row, id: uid(), createdAt: Date.now() } as T;",
+      "    write(`breezy:db:${collection}`, [record, ...items]);",
+      "    return record;",
+      "  },",
+      "  update<T extends Row = Row>(collection: string, id: string, patch: Partial<T>): void {",
+      "    const items = db.list<T>(collection).map((it) => (it.id === id ? { ...it, ...patch } : it));",
+      "    write(`breezy:db:${collection}`, items);",
+      "  },",
+      "  remove(collection: string, id: string): void {",
+      "    write(`breezy:db:${collection}`, db.list(collection).filter((it) => it.id !== id));",
+      "  },",
+      "};",
+      "",
+    );
+  }
+
+  if (wantAuth) {
+    parts.push(
+      "export type User = { id: string; email: string };",
+      "",
+      "type StoredUser = User & { password: string };",
+      "",
+      "export const auth = {",
+      "  async signUp(email: string, password: string): Promise<User> {",
+      "    const users = read<StoredUser[]>('breezy:auth:users', []);",
+      "    if (users.some((u) => u.email === email)) throw new Error('Email already registered');",
+      "    const user: StoredUser = { id: uid(), email, password };",
+      "    write('breezy:auth:users', [...users, user]);",
+      "    write('breezy:auth:session', { id: user.id, email: user.email });",
+      "    return { id: user.id, email: user.email };",
+      "  },",
+      "  async signIn(email: string, password: string): Promise<User> {",
+      "    const users = read<StoredUser[]>('breezy:auth:users', []);",
+      "    const found = users.find((u) => u.email === email && u.password === password);",
+      "    if (!found) throw new Error('Invalid email or password');",
+      "    const session = { id: found.id, email: found.email };",
+      "    write('breezy:auth:session', session);",
+      "    return session;",
+      "  },",
+      "  signOut(): void {",
+      "    localStorage.removeItem('breezy:auth:session');",
+      "  },",
+      "  currentUser(): User | null {",
+      "    return read<User | null>('breezy:auth:session', null);",
+      "  },",
+      "};",
+      "",
+    );
+  }
+
+  return parts.join("\n");
 }

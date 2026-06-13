@@ -67,6 +67,8 @@ Lean toward \`edit_file\` when in doubt. Use \`write_file\` when less than half 
 Fallback: if \`edit_file\` fails twice in a row on the same edit (text cannot be matched uniquely), stop retrying and use \`write_file\`.
 
 Add npm packages with \`add_dependency\`, not by hand-editing package.json.
+
+When the user asks to add login/accounts or to save/persist data, call \`scaffold_backend\` to generate a working in-browser backend (\`src/lib/breezy-backend.ts\`) instead of hand-writing storage logic. It provides \`auth\` (signUp/signIn/signOut/currentUser) and \`db\` (list/insert/update/remove) that run live in the preview. Then wire the generated UI to those helpers.
 </file_editing_tool_selection>`;
 
 const DEVELOPMENT_WORKFLOW_BLOCK = `<development_workflow>

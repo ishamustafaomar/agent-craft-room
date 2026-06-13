@@ -53,7 +53,7 @@ export const getProject = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data: project, error } = await supabase
       .from("projects")
-      .select("id, name, template, chat_summary, created_at, updated_at")
+      .select("id, name, template, chat_summary, is_public, published_at, created_at, updated_at")
       .eq("id", data.projectId)
       .single();
     if (error || !project) throw new Error(error?.message ?? "Project not found");
@@ -251,6 +251,174 @@ export const saveMessages = createServerFn({ method: "POST" })
       }));
       const { error: insError } = await supabase.from("chat_messages").insert(rows);
       if (insError) throw new Error(insError.message);
+    }
+    return { ok: true };
+  });
+
+// ---------- Publishing / sharing ----------
+
+export const setProjectPublic = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ projectId: z.string().uuid(), isPublic: z.boolean() }))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("projects")
+      .update({
+        is_public: data.isPublic,
+        published_at: data.isPublic ? new Date().toISOString() : null,
+      })
+      .eq("id", data.projectId);
+    if (error) throw new Error(error.message);
+    return { ok: true, isPublic: data.isPublic };
+  });
+
+// Public read for the shareable /p/:projectId route. No auth: only returns data
+// when the project is explicitly marked public. Uses the admin client because
+// public route loaders run during SSR/prerender with no bearer token.
+export const getPublicProject = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ projectId: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: project, error } = await supabaseAdmin
+      .from("projects")
+      .select("id, name, is_public")
+      .eq("id", data.projectId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!project || !project.is_public) return { project: null, files: [] as { path: string; content: string }[] };
+
+    const { data: files, error: filesError } = await supabaseAdmin
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId)
+      .order("path", { ascending: true });
+    if (filesError) throw new Error(filesError.message);
+
+    return { project: { id: project.id, name: project.name }, files: files ?? [] };
+  });
+
+// ---------- Version history (snapshots) ----------
+
+export const createSnapshot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      projectId: z.string().uuid(),
+      label: z.string().trim().min(1).max(120).default("Snapshot"),
+      files: z
+        .array(z.object({ path: z.string().min(1).max(400), content: z.string().max(500_000) }))
+        .max(1000),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    // Ownership is enforced by RLS via the project relationship.
+    const { data: row, error } = await supabase
+      .from("project_snapshots")
+      .insert({ project_id: data.projectId, label: data.label, files: data.files })
+      .select("id, label, created_at")
+      .single();
+    if (error || !row) throw new Error(error?.message ?? "Failed to save version");
+
+    // Keep only the 30 most recent snapshots per project.
+    const { data: old } = await supabase
+      .from("project_snapshots")
+      .select("id")
+      .eq("project_id", data.projectId)
+      .order("created_at", { ascending: false })
+      .range(30, 1000);
+    if (old && old.length > 0) {
+      await supabase
+        .from("project_snapshots")
+        .delete()
+        .in(
+          "id",
+          old.map((o) => o.id),
+        );
+    }
+    return row;
+  });
+
+export const listSnapshots = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ projectId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("project_snapshots")
+      .select("id, label, created_at")
+      .eq("project_id", data.projectId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const getSnapshot = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ snapshotId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase
+      .from("project_snapshots")
+      .select("id, label, files, created_at")
+      .eq("id", data.snapshotId)
+      .single();
+    if (error || !row) throw new Error(error?.message ?? "Version not found");
+    return row as { id: string; label: string; files: { path: string; content: string }[]; created_at: string };
+  });
+
+export const deleteSnapshot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ snapshotId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("project_snapshots")
+      .delete()
+      .eq("id", data.snapshotId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// Replace the full file set of a project (used by snapshot restore). Deletes
+// files not present in the incoming set, then upserts the rest.
+export const replaceProjectFiles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      projectId: z.string().uuid(),
+      files: z
+        .array(z.object({ path: z.string().min(1).max(400), content: z.string().max(500_000) }))
+        .max(1000),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const keepPaths = new Set(data.files.map((f) => f.path));
+
+    const { data: existing, error: exErr } = await supabase
+      .from("project_files")
+      .select("path")
+      .eq("project_id", data.projectId);
+    if (exErr) throw new Error(exErr.message);
+
+    const toDelete = (existing ?? []).map((f) => f.path).filter((p) => !keepPaths.has(p));
+    if (toDelete.length > 0) {
+      const { error: delErr } = await supabase
+        .from("project_files")
+        .delete()
+        .eq("project_id", data.projectId)
+        .in("path", toDelete);
+      if (delErr) throw new Error(delErr.message);
+    }
+
+    if (data.files.length > 0) {
+      const rows = data.files.map((f) => ({
+        project_id: data.projectId,
+        path: f.path,
+        content: f.content,
+      }));
+      const { error: upErr } = await supabase
+        .from("project_files")
+        .upsert(rows, { onConflict: "project_id,path" });
+      if (upErr) throw new Error(upErr.message);
     }
     return { ok: true };
   });

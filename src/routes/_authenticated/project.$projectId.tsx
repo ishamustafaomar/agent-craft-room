@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { UIMessage } from "ai";
@@ -8,7 +8,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { getProject, touchProject } from "@/lib/projects.functions";
+import { getProject, touchProject, createSnapshot } from "@/lib/projects.functions";
 import { createWorkspaceRuntime } from "@/lib/execution/workspace-runtime";
 import type { FileMap } from "@/lib/execution/types";
 import type {
@@ -32,6 +32,10 @@ import { MODEL_GROUPS, DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, Download } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { ShareDialog } from "@/components/workspace/share-dialog";
+import { VersionHistory } from "@/components/workspace/version-history";
+import { GithubExport } from "@/components/workspace/github-export";
+import { PresenceBar } from "@/components/workspace/presence-bar";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -91,6 +95,7 @@ function Workspace() {
       projectId={projectId}
       projectName={data.project.name}
       template={data.project.template}
+      initialPublic={data.project.is_public ?? false}
       initialFiles={Object.fromEntries(data.files.map((f) => [f.path, f.content]))}
       initialMessages={initialMessages}
       // Only auto-run the prompt for a brand-new project with no history yet.
@@ -103,6 +108,7 @@ function WorkspaceInner({
   projectId,
   projectName,
   template,
+  initialPublic,
   initialFiles,
   initialMessages,
   initialPrompt,
@@ -110,6 +116,7 @@ function WorkspaceInner({
   projectId: string;
   projectName: string;
   template: string;
+  initialPublic: boolean;
   initialFiles: FileMap;
   initialMessages: UIMessage[];
   initialPrompt?: string;
@@ -253,6 +260,31 @@ function WorkspaceInner({
     runtime.writeFile(path, content);
   }
 
+  // Restore a snapshot: swap in-memory files (DB already updated by the caller).
+  function handleRestoreFiles(next: FileMap) {
+    filesRef.current = next;
+    setFiles(next);
+    setSelectedPath(Object.keys(next).sort()[0] ?? null);
+  }
+
+  // Auto-capture a version when an agent build turn settles (skips no-op turns).
+  const createSnapshotFn = useServerFn(createSnapshot);
+  const lastSnapSig = useRef<string>("");
+  const handleTurnSettled = useCallback(() => {
+    const current = filesRef.current;
+    const sig = Object.keys(current)
+      .sort()
+      .map((k) => `${k}:${current[k].length}`)
+      .join("|");
+    if (sig === lastSnapSig.current) return;
+    lastSnapSig.current = sig;
+    const files = Object.entries(current).map(([path, content]) => ({ path, content }));
+    createSnapshotFn({
+      data: { projectId, label: `Build · ${new Date().toLocaleString()}`, files },
+    }).catch(() => {});
+  }, [projectId, createSnapshotFn]);
+
+
 
 
 
@@ -272,6 +304,7 @@ function WorkspaceInner({
         </span>
 
         <div className="ml-auto flex items-center gap-2">
+          <PresenceBar projectId={projectId} />
           <Select value={agentMode} onValueChange={handleModeChange}>
             <SelectTrigger className="h-8 w-[110px] text-xs">
               <SelectValue placeholder="Mode" />
@@ -299,6 +332,16 @@ function WorkspaceInner({
               ))}
             </SelectContent>
           </Select>
+          <VersionHistory
+            projectId={projectId}
+            getFiles={() => filesRef.current}
+            onRestore={handleRestoreFiles}
+          />
+          <ShareDialog projectId={projectId} initialPublic={initialPublic} />
+          <GithubExport
+            getFiles={() => filesRef.current}
+            defaultRepo={projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "breezy-app"}
+          />
           <Button
             variant="outline"
             size="sm"
@@ -332,6 +375,7 @@ function WorkspaceInner({
             getAiRules={() => filesRef.current["AI_RULES.md"] ?? ""}
             onExitPlan={() => handleModeChange("build")}
             onCommandOutput={appendTerminal}
+            onTurnSettled={handleTurnSettled}
           />
 
         </ResizablePanel>
