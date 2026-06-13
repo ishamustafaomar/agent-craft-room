@@ -167,6 +167,11 @@ const allTools = {
       "Transition from Plan mode to Build mode after the user accepts the plan. Call as your only action once accepted.",
     inputSchema: exitPlanSchema,
   }),
+  write_app_blueprint: tool({
+    description:
+      "For a NEW app only: present a lightweight blueprint (name, design direction, primary color, asset prompts) for the user to review before implementation. Ends your turn; the user approves before you build.",
+    inputSchema: writeAppBlueprintSchema,
+  }),
 } as const;
 
 export type AgentToolName = keyof typeof allTools;
