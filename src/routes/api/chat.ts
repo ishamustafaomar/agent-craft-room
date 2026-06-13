@@ -98,22 +98,26 @@ export const Route = createFileRoute("/api/chat")({
             ? body.model
             : DEFAULT_MODEL;
 
+        const mode = parseMode(body.mode);
+
         const system = buildSystemPrompt({
+          mode,
           projectName: typeof body.projectName === "string" ? body.projectName : undefined,
           template: typeof body.template === "string" ? body.template : undefined,
           fileTree: typeof body.fileTree === "string" ? body.fileTree : undefined,
+          aiRules: typeof body.aiRules === "string" ? body.aiRules : undefined,
         });
 
         const initialRunId = getLovableAiGatewayRunId(request);
         const gateway = createLovableAiGatewayProvider(key, initialRunId);
 
-        const history = compactHistory(messages as UIMessage[]);
+        const history = await compactHistory(messages as UIMessage[], gateway);
 
         const result = streamText({
           model: gateway(model),
           system,
           messages: await convertToModelMessages(history),
-          tools: agentTools,
+          tools: getToolsForMode(mode),
           stopWhen: stepCountIs(50),
         });
 
