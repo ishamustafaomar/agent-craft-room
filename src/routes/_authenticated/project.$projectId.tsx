@@ -304,6 +304,7 @@ function WorkspaceInner({
         </span>
 
         <div className="ml-auto flex items-center gap-2">
+          <PresenceBar projectId={projectId} />
           <Select value={agentMode} onValueChange={handleModeChange}>
             <SelectTrigger className="h-8 w-[110px] text-xs">
               <SelectValue placeholder="Mode" />
