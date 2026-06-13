@@ -10,6 +10,7 @@ import {
 } from "@/lib/ai-gateway.server";
 import { agentTools } from "@/lib/agent/tools";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
+import { DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 
 interface ChatRequestBody {
   messages?: unknown;
@@ -19,7 +20,27 @@ interface ChatRequestBody {
   fileTree?: unknown;
 }
 
-const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+// Keep the most recent turns so long conversations stay within context limits.
+// The agent persists a running summary via the set_chat_summary tool, so older
+// detail is not lost from the product, only from the model's working window.
+const MAX_HISTORY_MESSAGES = 40;
+
+function compactHistory(messages: UIMessage[]): UIMessage[] {
+  if (messages.length <= MAX_HISTORY_MESSAGES) return messages;
+  return messages.slice(-MAX_HISTORY_MESSAGES);
+}
+
+function describeStreamError(error: unknown): string {
+  const text =
+    error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  if (/\b429\b|rate.?limit/i.test(text)) {
+    return "Rate limit reached. Please wait a moment and try again.";
+  }
+  if (/\b402\b|credit|quota|insufficient/i.test(text)) {
+    return "AI credits are exhausted. Add credits in Settings → Workspace → Usage to continue.";
+  }
+  return "The AI agent ran into an error. Please try again.";
+}
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -63,7 +84,7 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         const model =
-          typeof body.model === "string" && body.model.length > 0
+          typeof body.model === "string" && isValidModel(body.model)
             ? body.model
             : DEFAULT_MODEL;
 
@@ -76,10 +97,12 @@ export const Route = createFileRoute("/api/chat")({
         const initialRunId = getLovableAiGatewayRunId(request);
         const gateway = createLovableAiGatewayProvider(key, initialRunId);
 
+        const history = compactHistory(messages as UIMessage[]);
+
         const result = streamText({
           model: gateway(model),
           system,
-          messages: await convertToModelMessages(messages as UIMessage[]),
+          messages: await convertToModelMessages(history),
           tools: agentTools,
           stopWhen: stepCountIs(50),
         });
@@ -91,7 +114,7 @@ export const Route = createFileRoute("/api/chat")({
           }),
           onError: (error) => {
             console.error("[chat] stream error", error);
-            return "The AI agent ran into an error. Please try again.";
+            return describeStreamError(error);
           },
         });
 

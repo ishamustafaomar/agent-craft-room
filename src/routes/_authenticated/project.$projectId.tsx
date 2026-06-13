@@ -18,7 +18,19 @@ import type {
 import { ChatPanel } from "@/components/workspace/chat-panel";
 import { EditorPanel } from "@/components/workspace/editor-panel";
 import { PreviewPanel } from "@/components/workspace/preview-panel";
-import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MODEL_GROUPS, DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
+import { toast } from "sonner";
+import { Sparkles, Loader2, ArrowLeft, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -27,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/project/$projectId")({
   component: Workspace,
 });
 
-const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
 
 function Workspace() {
   const { projectId } = useParams({ from: "/_authenticated/project/$projectId" });
@@ -109,6 +121,47 @@ function WorkspaceInner({
   const [wcStatus, setWcStatus] = useState<WCStatus>("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [supported, setSupported] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  // Per-project model selection, persisted in the browser.
+  const modelStorageKey = `forge:model:${projectId}`;
+  const [model, setModel] = useState<string>(() => {
+    if (typeof window === "undefined") return DEFAULT_MODEL;
+    const saved = window.localStorage.getItem(modelStorageKey);
+    return saved && isValidModel(saved) ? saved : DEFAULT_MODEL;
+  });
+
+  function handleModelChange(next: string) {
+    setModel(next);
+    try {
+      window.localStorage.setItem(modelStorageKey, next);
+    } catch {
+      /* ignore storage failures */
+    }
+  }
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+      for (const [path, content] of Object.entries(filesRef.current)) {
+        zip.file(path, content);
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "project"}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }
+
 
   const filesRef = useRef<FileMap>(initialFiles);
   filesRef.current = files;
@@ -199,7 +252,42 @@ function WorkspaceInner({
         <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
           {template}
         </span>
+
+        <div className="ml-auto flex items-center gap-2">
+          <Select value={model} onValueChange={handleModelChange}>
+            <SelectTrigger className="h-8 w-[170px] text-xs">
+              <SelectValue placeholder="Model" />
+            </SelectTrigger>
+            <SelectContent>
+              {MODEL_GROUPS.map((group) => (
+                <SelectGroup key={group.provider}>
+                  <SelectLabel>{group.provider}</SelectLabel>
+                  {group.models.map((m) => (
+                    <SelectItem key={m.id} value={m.id} className="text-xs">
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5"
+            onClick={handleExport}
+            disabled={exporting}
+          >
+            {exporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Download className="h-3.5 w-3.5" />
+            )}
+            Export
+          </Button>
+        </div>
       </header>
+
 
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
         <ResizablePanel defaultSize={32} minSize={22}>
@@ -207,7 +295,7 @@ function WorkspaceInner({
             projectId={projectId}
             projectName={projectName}
             template={template}
-            model={DEFAULT_MODEL}
+            model={model}
             runtime={runtime}
             initialMessages={initialMessages}
             initialPrompt={initialPrompt}

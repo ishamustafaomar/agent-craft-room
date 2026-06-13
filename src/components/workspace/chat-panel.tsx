@@ -15,6 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToolActivity } from "./tool-activity";
 import { MarkdownMessage } from "./markdown-message";
 import { Sparkles, ArrowUp, Loader2, Square } from "lucide-react";
+import { toast } from "sonner";
 
 interface ChatPanelProps {
   projectId: string;
@@ -81,6 +82,8 @@ export function ChatPanel({
     },
     onError: (err) => {
       console.error("[chat]", err);
+      const msg = err instanceof Error ? err.message : "The agent ran into an error.";
+      toast.error(msg);
     },
   });
 
