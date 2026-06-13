@@ -41,7 +41,7 @@ function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-breezy-mesh text-[oklch(0.22_0.03_280)]">
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <BrandLogo size={28} />
         <nav className="flex items-center gap-2">
