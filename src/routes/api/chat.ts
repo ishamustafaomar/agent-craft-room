@@ -30,15 +30,8 @@ function parseMode(value: unknown): AgentMode {
     : "build";
 }
 
-// Keep the most recent turns so long conversations stay within context limits.
-// The agent persists a running summary via the set_chat_summary tool, so older
-// detail is not lost from the product, only from the model's working window.
-const MAX_HISTORY_MESSAGES = 40;
+import { compactHistory } from "@/lib/agent/compaction";
 
-function compactHistory(messages: UIMessage[]): UIMessage[] {
-  if (messages.length <= MAX_HISTORY_MESSAGES) return messages;
-  return messages.slice(-MAX_HISTORY_MESSAGES);
-}
 
 function describeStreamError(error: unknown): string {
   const text =
