@@ -205,6 +205,7 @@ const BUILD_TOOLS: AgentToolName[] = [
   "delete_file",
   "add_dependency",
   "run_command",
+  "scaffold_backend",
   "write_app_blueprint",
 ];
 
