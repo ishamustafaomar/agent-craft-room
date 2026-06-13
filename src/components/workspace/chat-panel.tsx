@@ -82,6 +82,8 @@ export function ChatPanel({
     },
     onError: (err) => {
       console.error("[chat]", err);
+      const msg = err instanceof Error ? err.message : "The agent ran into an error.";
+      toast.error(msg);
     },
   });
 
