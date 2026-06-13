@@ -34,6 +34,7 @@ import { Loader2, ArrowLeft, Download } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShareDialog } from "@/components/workspace/share-dialog";
 import { VersionHistory } from "@/components/workspace/version-history";
+import { GithubExport } from "@/components/workspace/github-export";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
   validateSearch: (search: Record<string, unknown>) => ({
