@@ -45,6 +45,14 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  head: () => ({
+    meta: [
+      { title: "Dashboard · Breezy" },
+      { name: "description", content: "Your Breezy projects. Create, manage, and vibe-code beautiful apps in minutes." },
+      { property: "og:title", content: "Dashboard · Breezy" },
+      { property: "og:description", content: "Your Breezy projects. Create, manage, and vibe-code beautiful apps in minutes." },
+    ],
+  }),
   component: Dashboard,
 });
 
