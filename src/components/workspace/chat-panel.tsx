@@ -230,7 +230,13 @@ export function ChatPanel({
             className="max-h-40 min-h-[44px] resize-none border-0 bg-transparent p-1.5 shadow-none focus-visible:ring-0"
           />
           {isBusy ? (
-            <Button size="icon" variant="secondary" onClick={() => stop()} className="shrink-0">
+            <Button
+              size="icon"
+              variant="secondary"
+              onClick={() => stop()}
+              aria-label="Stop generating"
+              className="shrink-0"
+            >
               <Square className="h-4 w-4" />
             </Button>
           ) : (
@@ -238,6 +244,7 @@ export function ChatPanel({
               size="icon"
               onClick={handleSend}
               disabled={!input.trim()}
+              aria-label="Send message"
               className="shrink-0"
             >
               <ArrowUp className="h-4 w-4" />

@@ -74,6 +74,7 @@ export function PreviewPanel({
             <button
               onClick={() => setIframeKey((k) => k + 1)}
               title="Reload preview"
+              aria-label="Reload preview"
               className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <RefreshCw className="h-3.5 w-3.5" />
@@ -85,6 +86,7 @@ export function PreviewPanel({
               target="_blank"
               rel="noreferrer"
               title="Open in new tab"
+              aria-label="Open preview in new tab"
               className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <ExternalLink className="h-3.5 w-3.5" />
