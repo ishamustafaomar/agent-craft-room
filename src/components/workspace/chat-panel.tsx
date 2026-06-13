@@ -174,8 +174,16 @@ export function ChatPanel({
               </p>
             </div>
           )}
-          {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+          {messages.map((message, idx) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              onApproveBlueprint={
+                !isBusy && idx === messages.length - 1
+                  ? handleApproveBlueprint
+                  : undefined
+              }
+            />
           ))}
           {status === "submitted" && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
