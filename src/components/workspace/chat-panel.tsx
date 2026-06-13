@@ -111,10 +111,7 @@ export function ChatPanel({
     return () => clearTimeout(timer);
   }, [status, messages, projectId]);
 
-  function handleSend() {
-    const text = input.trim();
-    if (!text || isBusy) return;
-    setInput("");
+  function submitPrompt(text: string) {
     sendMessage(
       { text },
       {
@@ -127,6 +124,25 @@ export function ChatPanel({
       },
     );
   }
+
+  function handleSend() {
+    const text = input.trim();
+    if (!text || isBusy) return;
+    setInput("");
+    submitPrompt(text);
+  }
+
+  // Auto-run the prompt the user typed on the dashboard for a fresh project.
+  const autoSentRef = useRef(false);
+  useEffect(() => {
+    if (autoSentRef.current) return;
+    const text = initialPrompt?.trim();
+    if (!text || messages.length > 0) return;
+    autoSentRef.current = true;
+    submitPrompt(text);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPrompt]);
+
 
   return (
     <div className="flex h-full flex-col bg-card">
