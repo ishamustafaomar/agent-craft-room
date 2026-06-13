@@ -194,7 +194,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap justify-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
             {PROMPT_IDEAS.map((idea) => (
               <button
                 key={idea}
@@ -205,6 +205,22 @@ function Dashboard() {
                 {idea}
               </button>
             ))}
+            <TemplateGallery
+              onSelect={(templateId) =>
+                createMut.mutate({
+                  name: deriveName(prompt) === "Untitled App" ? TEMPLATES[templateId]?.name ?? "Untitled App" : deriveName(prompt),
+                  template: templateId,
+                })
+              }
+              trigger={
+                <button
+                  type="button"
+                  className="rounded-full border border-dashed border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                >
+                  Browse templates
+                </button>
+              }
+            />
           </div>
         </section>
 
