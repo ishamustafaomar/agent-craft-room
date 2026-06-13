@@ -42,7 +42,7 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <BrandLogo size={28} />
         <nav className="flex items-center gap-2">
           {signedIn ? (
@@ -63,26 +63,41 @@ function Landing() {
       </header>
 
       <main>
-        <section className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center">
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 text-primary" /> The friendliest AI builder · live in your browser
-          </div>
-          <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-            Vibe-code beautiful apps{" "}
-            <span className="bg-gradient-to-r from-primary to-[oklch(0.72_0.14_220)] bg-clip-text text-transparent">
-              in minutes
-            </span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-muted-foreground">
-            Breezy is the friendliest AI builder for shipping web apps. Describe it,
-            see it, ship it — files, commands, and a live preview, all in your browser.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <Link to={signedIn ? "/dashboard" : "/auth"}>
-              <Button size="lg" className="gap-2">
-                Start building <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+        {/* Dreamy pastel hero — mirrors the Breezy brand artwork */}
+        <section className="relative overflow-hidden">
+          <div className="bg-breezy-mesh absolute inset-0 -z-10" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent to-background" />
+
+          {/* Floating pastel confetti */}
+          <span className="absolute left-[12%] top-[22%] h-4 w-4 rounded-full bg-breezy-pink/80" />
+          <span className="absolute left-[16%] top-[42%] h-7 w-7 rounded-full bg-breezy-mint/80" />
+          <span className="absolute left-[9%] top-[58%] h-4 w-4 rounded-full bg-breezy-blue/80" />
+          <span className="absolute left-[26%] top-[18%] h-9 w-9 rounded-xl bg-breezy-mint/70" />
+          <span className="absolute right-[14%] top-[28%] h-4 w-4 rounded-full bg-breezy-pink/80" />
+          <span className="absolute right-[10%] top-[44%] h-5 w-5 rounded-full bg-breezy-yellow/80" />
+          <span className="absolute right-[13%] top-[60%] h-6 w-6 rounded-full bg-breezy-blue/80" />
+          <span className="absolute right-[20%] bottom-[12%] h-9 w-9 rounded-xl bg-breezy-pink/60" />
+
+          <div className="relative mx-auto max-w-3xl px-6 pb-24 pt-24 text-center">
+            <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+              <Zap className="h-3.5 w-3.5 text-primary" /> The friendliest AI builder · live in your browser
+            </div>
+            <h1 className="font-display text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-7xl">
+              Vibe-code beautiful
+              <br />
+              apps in minutes
+            </h1>
+            <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-muted-foreground">
+              Breezy is the friendliest AI builder for shipping web apps. Describe it,
+              see it, ship it — files, commands, and a live preview, all in your browser.
+            </p>
+            <div className="mt-9 flex items-center justify-center gap-3">
+              <Link to={signedIn ? "/dashboard" : "/auth"}>
+                <Button size="lg" className="gap-2 shadow-soft">
+                  Start building <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
 
