@@ -265,7 +265,7 @@ function WorkspaceInner({
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <Sparkles className="h-4 w-4 text-primary" />
+        <BrandLogo size={18} showWordmark={false} />
         <span className="text-sm font-medium">{projectName}</span>
         <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
           {template}
