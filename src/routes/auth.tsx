@@ -82,16 +82,16 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-breezy-mesh px-4 text-[oklch(0.22_0.03_280)]">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center text-foreground">
+        <Link to="/" className="mb-8 flex items-center justify-center text-[oklch(0.22_0.03_280)]">
           <BrandLogo size={32} className="gap-2.5 [&>span]:text-xl" />
         </Link>
-        <Card className="p-8">
-          <h1 className="text-2xl font-semibold tracking-tight">
+        <Card className="border-white/60 bg-white/70 p-8 shadow-soft backdrop-blur">
+          <h1 className="text-2xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)]">
             {mode === "signin" ? "Welcome back" : "Create your account"}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-[oklch(0.4_0.03_280)]">
             {mode === "signin"
               ? "Sign in to keep building."
               : "Start building apps with AI in seconds."}
@@ -100,7 +100,7 @@ function AuthPage() {
           <Button
             type="button"
             variant="outline"
-            className="mt-6 w-full"
+            className="mt-6 w-full border-[oklch(0.22_0.03_280/0.15)] bg-white/60 text-[oklch(0.22_0.03_280)] hover:bg-white"
             onClick={handleGoogle}
             disabled={googleLoading}
           >
@@ -112,27 +112,28 @@ function AuthPage() {
             Continue with Google
           </Button>
 
-          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-            <div className="h-px flex-1 bg-border" />
+          <div className="my-5 flex items-center gap-3 text-xs text-[oklch(0.45_0.03_280)]">
+            <div className="h-px flex-1 bg-[oklch(0.22_0.03_280/0.12)]" />
             or
-            <div className="h-px flex-1 bg-border" />
+            <div className="h-px flex-1 bg-[oklch(0.22_0.03_280/0.12)]" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="name">Display name</Label>
+                <Label htmlFor="name" className="text-[oklch(0.3_0.03_280)]">Display name</Label>
                 <Input
                   id="name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Ada Lovelace"
                   autoComplete="name"
+                  className="border-[oklch(0.22_0.03_280/0.15)] bg-white/80 text-[oklch(0.22_0.03_280)] placeholder:text-[oklch(0.55_0.03_280)]"
                 />
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-[oklch(0.3_0.03_280)]">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -141,10 +142,11 @@ function AuthPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
+                className="border-[oklch(0.22_0.03_280/0.15)] bg-white/80 text-[oklch(0.22_0.03_280)] placeholder:text-[oklch(0.55_0.03_280)]"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[oklch(0.3_0.03_280)]">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -154,15 +156,16 @@ function AuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                className="border-[oklch(0.22_0.03_280/0.15)] bg-white/80 text-[oklch(0.22_0.03_280)] placeholder:text-[oklch(0.55_0.03_280)]"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full shadow-soft" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {mode === "signin" ? "Sign in" : "Create account"}
             </Button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm text-[oklch(0.4_0.03_280)]">
             {mode === "signin" ? "No account yet?" : "Already have an account?"}{" "}
             <button
               type="button"

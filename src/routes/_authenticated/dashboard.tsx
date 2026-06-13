@@ -131,16 +131,16 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
+    <div className="min-h-screen bg-breezy-mesh text-[oklch(0.22_0.03_280)]">
+      <header className="border-b border-[oklch(0.22_0.03_280/0.1)] bg-white/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/dashboard" className="flex items-center">
             <BrandLogo size={26} />
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <Button variant="ghost" size="sm" className="gap-2 hover:bg-white/50">
+                <span className="text-sm text-[oklch(0.4_0.03_280)]">{user?.email}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -160,14 +160,14 @@ function Dashboard() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         {/* Build-from-prompt hero */}
         <section className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)] sm:text-4xl">
             What do you want to build?
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-[oklch(0.4_0.03_280)]">
             Describe your app and the agent will scaffold it and start building.
           </p>
 
-          <div className="mt-6 rounded-2xl border border-input bg-card p-3 text-left shadow-sm">
+          <div className="mt-6 rounded-2xl border border-white/60 bg-white/70 p-3 text-left shadow-soft backdrop-blur">
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -178,7 +178,7 @@ function Dashboard() {
                 }
               }}
               placeholder="e.g. A habit tracker with streaks, reminders, and a weekly chart"
-              className="min-h-[88px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+              className="min-h-[88px] resize-none border-0 bg-transparent text-[oklch(0.22_0.03_280)] shadow-none placeholder:text-[oklch(0.55_0.03_280)] focus-visible:ring-0"
             />
             <div className="flex items-center justify-end gap-2 px-1 pt-1">
               <Button
@@ -202,7 +202,7 @@ function Dashboard() {
                 key={idea}
                 type="button"
                 onClick={() => setPrompt(idea)}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                className="rounded-full border border-white/60 bg-white/50 px-3 py-1 text-xs text-[oklch(0.4_0.03_280)] backdrop-blur transition-colors hover:bg-white hover:text-[oklch(0.22_0.03_280)]"
               >
                 {idea}
               </button>
@@ -217,7 +217,7 @@ function Dashboard() {
               trigger={
                 <button
                   type="button"
-                  className="rounded-full border border-dashed border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                  className="rounded-full border border-dashed border-white/70 bg-white/40 px-3 py-1 text-xs text-[oklch(0.4_0.03_280)] backdrop-blur transition-colors hover:bg-white hover:text-[oklch(0.22_0.03_280)]"
                 >
                   Browse templates
                 </button>
@@ -233,18 +233,18 @@ function Dashboard() {
 
         {/* Projects */}
         <div className="mt-14 flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Your projects</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-[oklch(0.22_0.03_280)]">Your projects</h2>
         </div>
 
         <div className="mt-5">
           {isLoading ? (
-            <div className="flex items-center justify-center py-20 text-muted-foreground">
+            <div className="flex items-center justify-center py-20 text-[oklch(0.4_0.03_280)]">
               <Loader2 className="h-6 w-6 animate-spin" />
             </div>
           ) : !projects || projects.length === 0 ? (
-            <Card className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-              <Sparkles className="h-8 w-8 text-muted-foreground" />
-              <p className="text-muted-foreground">
+            <Card className="flex flex-col items-center justify-center gap-3 border-white/60 bg-white/60 py-16 text-center shadow-soft backdrop-blur">
+              <Sparkles className="h-8 w-8 text-[oklch(0.55_0.12_300)]" />
+              <p className="text-[oklch(0.4_0.03_280)]">
                 No projects yet — describe an app above to get started.
               </p>
             </Card>
@@ -253,18 +253,18 @@ function Dashboard() {
               {projects.map((p) => (
                 <Card
                   key={p.id}
-                  className="group relative cursor-pointer p-5 transition-colors hover:border-primary/50"
+                  className="group relative cursor-pointer border-white/60 bg-white/60 p-5 shadow-soft backdrop-blur transition-colors hover:bg-white/80"
                   onClick={() =>
                     navigate({ to: "/project/$projectId", params: { projectId: p.id } })
                   }
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Code2 className="h-5 w-5 text-primary" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/70">
+                      <Code2 className="h-5 w-5 text-[oklch(0.55_0.12_300)]" />
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/60">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -298,11 +298,11 @@ function Dashboard() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  <h3 className="mt-4 font-medium tracking-tight">{p.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                  <h3 className="mt-4 font-medium tracking-tight text-[oklch(0.22_0.03_280)]">{p.name}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-[oklch(0.4_0.03_280)]">
                     {p.chat_summary || TEMPLATES[p.template]?.name || "No activity yet"}
                   </p>
-                  <p className="mt-3 text-xs text-muted-foreground">
+                  <p className="mt-3 text-xs text-[oklch(0.5_0.03_280)]">
                     Updated {new Date(p.updated_at).toLocaleDateString()}
                   </p>
                 </Card>
