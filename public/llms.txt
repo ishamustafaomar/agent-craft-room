@@ -1,0 +1,10 @@
+# Breezy
+
+> Breezy is the friendliest AI builder for shipping web apps. Describe it, see it, ship it — files, commands, and a live preview, all in your browser.
+
+Breezy lets you vibe-code beautiful full-stack web apps in minutes. A streaming, tool-calling AI agent writes real files, runs commands in a secure in-browser sandbox, and shows a live preview as it works. Projects and conversations are saved to your account.
+
+## Pages
+
+- [Home](/): What Breezy is and how vibe-coding works.
+- [Sign in](/auth): Sign in or create an account to start building.
