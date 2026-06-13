@@ -263,7 +263,9 @@ function MessageBubble({
             );
           }
           if (part.type.startsWith("tool-")) {
-            return <ToolActivity key={i} part={part} />;
+            return (
+              <ToolActivity key={i} part={part} onApproveBlueprint={onApproveBlueprint} />
+            );
           }
           return null;
         })}
