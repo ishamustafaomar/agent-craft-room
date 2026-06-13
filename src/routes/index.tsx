@@ -65,17 +65,17 @@ function Landing() {
       <main>
         <section className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center">
           <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 text-primary" /> AI coding agent · live in your browser
+            <Zap className="h-3.5 w-3.5 text-primary" /> The friendliest AI builder · live in your browser
           </div>
           <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-            Build full-stack apps by{" "}
-            <span className="bg-gradient-to-r from-primary to-[oklch(0.72_0.18_300)] bg-clip-text text-transparent">
-              chatting
+            Vibe-code beautiful apps{" "}
+            <span className="bg-gradient-to-r from-primary to-[oklch(0.72_0.14_220)] bg-clip-text text-transparent">
+              in minutes
             </span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-muted-foreground">
-            Describe what you want. The agent reasons, writes files, runs commands, and shows
-            you a live preview — Lovable, Cursor, and Replit Agent in one.
+            Breezy is the friendliest AI builder for shipping web apps. Describe it,
+            see it, ship it — files, commands, and a live preview, all in your browser.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3">
             <Link to={signedIn ? "/dashboard" : "/auth"}>
