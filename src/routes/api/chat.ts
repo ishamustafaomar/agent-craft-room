@@ -31,7 +31,7 @@ function parseMode(value: unknown): AgentMode {
     : "build";
 }
 
-import { compactHistory } from "@/lib/agent/compaction";
+
 
 
 function describeStreamError(error: unknown): string {
