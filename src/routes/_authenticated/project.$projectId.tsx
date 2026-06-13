@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/project/$projectId")({
   component: Workspace,
 });
 
-const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
 
 function Workspace() {
   const { projectId } = useParams({ from: "/_authenticated/project/$projectId" });
