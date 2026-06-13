@@ -210,6 +210,7 @@ function WorkspaceInner({
             model={DEFAULT_MODEL}
             runtime={runtime}
             initialMessages={initialMessages}
+            initialPrompt={initialPrompt}
             getFileTree={() => Object.keys(filesRef.current).sort().join("\n")}
           />
         </ResizablePanel>
