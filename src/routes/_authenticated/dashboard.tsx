@@ -202,7 +202,7 @@ function Dashboard() {
                 key={idea}
                 type="button"
                 onClick={() => setPrompt(idea)}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                className="rounded-full border border-white/60 bg-white/50 px-3 py-1 text-xs text-[oklch(0.4_0.03_280)] backdrop-blur transition-colors hover:bg-white hover:text-[oklch(0.22_0.03_280)]"
               >
                 {idea}
               </button>
@@ -217,7 +217,7 @@ function Dashboard() {
               trigger={
                 <button
                   type="button"
-                  className="rounded-full border border-dashed border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                  className="rounded-full border border-dashed border-white/70 bg-white/40 px-3 py-1 text-xs text-[oklch(0.4_0.03_280)] backdrop-blur transition-colors hover:bg-white hover:text-[oklch(0.22_0.03_280)]"
                 >
                   Browse templates
                 </button>
@@ -233,7 +233,7 @@ function Dashboard() {
 
         {/* Projects */}
         <div className="mt-14 flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Your projects</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-[oklch(0.22_0.03_280)]">Your projects</h2>
         </div>
 
         <div className="mt-5">
