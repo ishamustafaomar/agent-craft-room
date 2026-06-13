@@ -8,16 +8,26 @@ import {
   withLovableAiGatewayRunIdHeader,
   LOVABLE_AIG_RUN_ID_HEADER,
 } from "@/lib/ai-gateway.server";
-import { agentTools } from "@/lib/agent/tools";
+import { getToolsForMode, type AgentMode } from "@/lib/agent/tools";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 
 interface ChatRequestBody {
   messages?: unknown;
   model?: unknown;
+  mode?: unknown;
   projectName?: unknown;
   template?: unknown;
   fileTree?: unknown;
+  aiRules?: unknown;
+}
+
+const VALID_MODES: AgentMode[] = ["build", "ask", "plan"];
+
+function parseMode(value: unknown): AgentMode {
+  return typeof value === "string" && (VALID_MODES as string[]).includes(value)
+    ? (value as AgentMode)
+    : "build";
 }
 
 // Keep the most recent turns so long conversations stay within context limits.
