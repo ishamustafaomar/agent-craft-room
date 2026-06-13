@@ -1,6 +1,13 @@
-# Stages 6–9 — Deepen the Agent Using Dyad as Reference
+# Stages 6–9 — Deepen the Agent Using Dyad as Reference ✅ DONE
 
 Goal: bring our web platform's agent layer up to Dyad's fidelity, adapting (not copying) its prompts, tools, modes, compaction, and project-rules flow to our TanStack Start + WebContainer architecture. Built in sequence; each stage ships and is verified before the next.
+
+**Status:** All four stages implemented.
+- Stage 6: structured multi-block system prompt; new tools `grep`, `code_search`, `rename_file`, `add_dependency`, `update_todos` (todo checklist UI), destructive-command guardrails.
+- Stage 7: Build/Ask/Plan modes with distinct prompts; mode selector in workspace header (per-project localStorage); server-enforced tool subsets via `getToolsForMode`; `write_plan`/`exit_plan` tools; plan card UI; `exit_plan` flips mode to Build.
+- Stage 8: smart compaction (`src/lib/agent/compaction.ts`) summarizes older turns into one synthetic context message via the gateway; adapted COMPACTION prompt.
+- Stage 9: `AI_RULES.md` seeded into every template, editable in the file tree, injected into all prompts; optional app-blueprint flow (`write_app_blueprint` tool + blueprint card with Approve & build).
+
 
 ---
 
