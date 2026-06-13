@@ -71,6 +71,7 @@ export function ChatPanel({
           onSummary: (summary) => {
             updateChatSummary({ data: { projectId, summary } }).catch(() => {});
           },
+          onExitPlan,
         });
         addToolOutput({
           tool: toolCall.toolName,
