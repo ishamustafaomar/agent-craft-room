@@ -84,7 +84,7 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         const model =
-          typeof body.model === "string" && body.model.length > 0
+          typeof body.model === "string" && isValidModel(body.model)
             ? body.model
             : DEFAULT_MODEL;
 
@@ -97,10 +97,12 @@ export const Route = createFileRoute("/api/chat")({
         const initialRunId = getLovableAiGatewayRunId(request);
         const gateway = createLovableAiGatewayProvider(key, initialRunId);
 
+        const history = compactHistory(messages as UIMessage[]);
+
         const result = streamText({
           model: gateway(model),
           system,
-          messages: await convertToModelMessages(messages as UIMessage[]),
+          messages: await convertToModelMessages(history),
           tools: agentTools,
           stopWhen: stepCountIs(50),
         });
