@@ -129,7 +129,9 @@ export function ChatPanel({
           projectName,
           template,
           model,
+          mode,
           fileTree: getFileTree(),
+          aiRules: getAiRules(),
         },
       },
     );
