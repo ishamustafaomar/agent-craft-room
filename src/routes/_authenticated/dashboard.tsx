@@ -167,7 +167,7 @@ function Dashboard() {
             Describe your app and the agent will scaffold it and start building.
           </p>
 
-          <div className="mt-6 rounded-2xl border border-input bg-card p-3 text-left shadow-sm">
+          <div className="mt-6 rounded-2xl border border-white/60 bg-white/70 p-3 text-left shadow-soft backdrop-blur">
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -178,7 +178,7 @@ function Dashboard() {
                 }
               }}
               placeholder="e.g. A habit tracker with streaks, reminders, and a weekly chart"
-              className="min-h-[88px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+              className="min-h-[88px] resize-none border-0 bg-transparent text-[oklch(0.22_0.03_280)] shadow-none placeholder:text-[oklch(0.55_0.03_280)] focus-visible:ring-0"
             />
             <div className="flex items-center justify-end gap-2 px-1 pt-1">
               <Button
