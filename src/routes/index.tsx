@@ -64,9 +64,9 @@ function Landing() {
 
       <main>
         {/* Dreamy pastel hero — mirrors the Breezy brand artwork */}
-        <section className="relative overflow-hidden">
-          <div className="bg-breezy-mesh absolute inset-0 -z-10" />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent to-background" />
+        <section className="bg-breezy-mesh relative overflow-hidden">
+          <div className="absolute inset-x-0 bottom-0 z-0 h-40 bg-gradient-to-b from-transparent to-background" />
+
 
           {/* Floating pastel confetti */}
           <span className="absolute left-[12%] top-[22%] h-4 w-4 rounded-full bg-breezy-pink/80" />
