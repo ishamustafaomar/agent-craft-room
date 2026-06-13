@@ -368,6 +368,7 @@ function WorkspaceInner({
             getAiRules={() => filesRef.current["AI_RULES.md"] ?? ""}
             onExitPlan={() => handleModeChange("build")}
             onCommandOutput={appendTerminal}
+            onTurnSettled={handleTurnSettled}
           />
 
         </ResizablePanel>
