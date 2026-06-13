@@ -13,6 +13,7 @@ import {
   ListTodo,
   ClipboardList,
   Rocket,
+  Compass,
   Loader2,
   Check,
   X,
