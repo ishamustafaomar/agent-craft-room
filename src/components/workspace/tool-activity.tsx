@@ -51,12 +51,22 @@ interface TodoItem {
   done: boolean;
 }
 
-export function ToolActivity({ part }: { part: ToolPart }) {
+export function ToolActivity({
+  part,
+  onApproveBlueprint,
+}: {
+  part: ToolPart;
+  onApproveBlueprint?: () => void;
+}) {
   const toolName = part.type.replace(/^tool-/, "");
   const input = (part.input ?? {}) as Record<string, unknown>;
 
   if (toolName === "update_todos" && Array.isArray(input.todos)) {
     return <TodoList todos={input.todos as TodoItem[]} />;
+  }
+
+  if (toolName === "write_app_blueprint" && typeof input.appName === "string") {
+    return <BlueprintCard input={input} onApprove={onApproveBlueprint} />;
   }
 
   if (toolName === "write_plan" && typeof input.plan === "string") {
