@@ -65,19 +65,23 @@ function Workspace() {
     );
   }
 
+  const initialMessages = data.messages.map(
+    (m): UIMessage => ({
+      id: m.message_id || m.id,
+      role: m.role as UIMessage["role"],
+      parts: (m.parts as UIMessage["parts"]) ?? [],
+    }),
+  );
+
   return (
     <WorkspaceInner
       projectId={projectId}
       projectName={data.project.name}
       template={data.project.template}
       initialFiles={Object.fromEntries(data.files.map((f) => [f.path, f.content]))}
-      initialMessages={data.messages.map(
-        (m): UIMessage => ({
-          id: m.message_id || m.id,
-          role: m.role as UIMessage["role"],
-          parts: (m.parts as UIMessage["parts"]) ?? [],
-        }),
-      )}
+      initialMessages={initialMessages}
+      // Only auto-run the prompt for a brand-new project with no history yet.
+      initialPrompt={initialMessages.length === 0 ? prompt : undefined}
     />
   );
 }
@@ -88,12 +92,14 @@ function WorkspaceInner({
   template,
   initialFiles,
   initialMessages,
+  initialPrompt,
 }: {
   projectId: string;
   projectName: string;
   template: string;
   initialFiles: FileMap;
   initialMessages: UIMessage[];
+  initialPrompt?: string;
 }) {
   const [files, setFiles] = useState<FileMap>(initialFiles);
   const [selectedPath, setSelectedPath] = useState<string | null>(
