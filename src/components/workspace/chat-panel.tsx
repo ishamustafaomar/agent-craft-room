@@ -235,7 +235,13 @@ export function ChatPanel({
   );
 }
 
-function MessageBubble({ message }: { message: UIMessage }) {
+function MessageBubble({
+  message,
+  onApproveBlueprint,
+}: {
+  message: UIMessage;
+  onApproveBlueprint?: () => void;
+}) {
   const isUser = message.role === "user";
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
