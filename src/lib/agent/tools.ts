@@ -79,6 +79,27 @@ export const exitPlanSchema = z.object({
   confirmation: z.boolean().describe("Set true only after the user accepts the plan."),
 });
 
+export const writeAppBlueprintSchema = z.object({
+  appName: z.string().min(1).describe("A creative, memorable name for the app."),
+  designDirection: z
+    .string()
+    .min(1)
+    .describe("A specific but concise (1-2 sentence) description of the visual design direction."),
+  primaryColor: z
+    .string()
+    .min(1)
+    .describe("A hex color that fits the industry and design direction, e.g. #4f46e5."),
+  assets: z
+    .array(
+      z.object({
+        name: z.string().min(1).describe("Short asset name, e.g. 'hero image'."),
+        prompt: z.string().min(1).describe("Detailed image-generation prompt for this asset."),
+      }),
+    )
+    .optional()
+    .describe("Visual assets the app needs (logo, photography, illustrations, backgrounds)."),
+});
+
 const allTools = {
   set_chat_summary: tool({
     description:
