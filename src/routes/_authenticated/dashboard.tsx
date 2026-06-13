@@ -238,13 +238,13 @@ function Dashboard() {
 
         <div className="mt-5">
           {isLoading ? (
-            <div className="flex items-center justify-center py-20 text-muted-foreground">
+            <div className="flex items-center justify-center py-20 text-[oklch(0.4_0.03_280)]">
               <Loader2 className="h-6 w-6 animate-spin" />
             </div>
           ) : !projects || projects.length === 0 ? (
-            <Card className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-              <Sparkles className="h-8 w-8 text-muted-foreground" />
-              <p className="text-muted-foreground">
+            <Card className="flex flex-col items-center justify-center gap-3 border-white/60 bg-white/60 py-16 text-center shadow-soft backdrop-blur">
+              <Sparkles className="h-8 w-8 text-[oklch(0.55_0.12_300)]" />
+              <p className="text-[oklch(0.4_0.03_280)]">
                 No projects yet — describe an app above to get started.
               </p>
             </Card>
@@ -253,18 +253,18 @@ function Dashboard() {
               {projects.map((p) => (
                 <Card
                   key={p.id}
-                  className="group relative cursor-pointer p-5 transition-colors hover:border-primary/50"
+                  className="group relative cursor-pointer border-white/60 bg-white/60 p-5 shadow-soft backdrop-blur transition-colors hover:bg-white/80"
                   onClick={() =>
                     navigate({ to: "/project/$projectId", params: { projectId: p.id } })
                   }
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Code2 className="h-5 w-5 text-primary" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/70">
+                      <Code2 className="h-5 w-5 text-[oklch(0.55_0.12_300)]" />
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/60">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -298,11 +298,11 @@ function Dashboard() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  <h3 className="mt-4 font-medium tracking-tight">{p.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                  <h3 className="mt-4 font-medium tracking-tight text-[oklch(0.22_0.03_280)]">{p.name}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-[oklch(0.4_0.03_280)]">
                     {p.chat_summary || TEMPLATES[p.template]?.name || "No activity yet"}
                   </p>
-                  <p className="mt-3 text-xs text-muted-foreground">
+                  <p className="mt-3 text-xs text-[oklch(0.5_0.03_280)]">
                     Updated {new Date(p.updated_at).toLocaleDateString()}
                   </p>
                 </Card>
