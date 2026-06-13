@@ -38,6 +38,14 @@ import { GithubExport } from "@/components/workspace/github-export";
 import { PresenceBar } from "@/components/workspace/presence-bar";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
+  head: () => ({
+    meta: [
+      { title: "Workspace · Breezy" },
+      { name: "description", content: "Build and iterate on your app with Breezy's AI-powered workspace." },
+      { property: "og:title", content: "Workspace · Breezy" },
+      { property: "og:description", content: "Build and iterate on your app with Breezy's AI-powered workspace." },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>) => ({
     prompt: typeof search.prompt === "string" ? search.prompt : undefined,
   }),
