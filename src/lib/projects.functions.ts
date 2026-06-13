@@ -53,7 +53,7 @@ export const getProject = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data: project, error } = await supabase
       .from("projects")
-      .select("id, name, template, chat_summary, created_at, updated_at")
+      .select("id, name, template, chat_summary, is_public, published_at, created_at, updated_at")
       .eq("id", data.projectId)
       .single();
     if (error || !project) throw new Error(error?.message ?? "Project not found");
