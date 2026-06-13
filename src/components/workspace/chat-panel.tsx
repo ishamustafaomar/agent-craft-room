@@ -61,7 +61,18 @@ export function ChatPanel({
         return token ? { Authorization: `Bearer ${token}` } : {};
       },
     }),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: ({ messages: msgs }) => {
+      // Terminal tools end the turn so the user can review/approve before the
+      // agent continues (or the mode switches).
+      const last = msgs[msgs.length - 1];
+      if (last?.role === "assistant") {
+        const hasTerminalTool = last.parts.some((p) =>
+          ["tool-write_app_blueprint", "tool-write_plan", "tool-exit_plan"].includes(p.type),
+        );
+        if (hasTerminalTool) return false;
+      }
+      return lastAssistantMessageIsCompleteWithToolCalls({ messages: msgs });
+    },
     onToolCall: async ({ toolCall }) => {
       if (toolCall.dynamic) return;
       try {
