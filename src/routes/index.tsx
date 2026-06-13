@@ -78,16 +78,16 @@ function Landing() {
           <span className="absolute right-[13%] top-[60%] h-6 w-6 rounded-full bg-breezy-blue/80" />
           <span className="absolute right-[20%] bottom-[12%] h-9 w-9 rounded-xl bg-breezy-pink/60" />
 
-          <div className="relative mx-auto max-w-3xl px-6 pb-24 pt-24 text-center">
-            <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <Zap className="h-3.5 w-3.5 text-primary" /> The friendliest AI builder · live in your browser
+          <div className="relative mx-auto max-w-3xl px-6 pb-24 pt-24 text-center text-[oklch(0.22_0.03_280)]">
+            <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-[oklch(0.22_0.03_280/0.12)] bg-white/50 px-3 py-1 text-xs text-[oklch(0.34_0.03_280)] backdrop-blur">
+              <Zap className="h-3.5 w-3.5 text-[oklch(0.55_0.12_300)]" /> The friendliest AI builder · live in your browser
             </div>
-            <h1 className="font-display text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-7xl">
+            <h1 className="font-display text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-7xl">
               Vibe-code beautiful
               <br />
               apps in minutes
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-muted-foreground">
+            <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-[oklch(0.4_0.03_280)]">
               Breezy is the friendliest AI builder for shipping web apps. Describe it,
               see it, ship it — files, commands, and a live preview, all in your browser.
             </p>
