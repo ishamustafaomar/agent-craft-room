@@ -271,6 +271,16 @@ function WorkspaceInner({
         </span>
 
         <div className="ml-auto flex items-center gap-2">
+          <Select value={agentMode} onValueChange={handleModeChange}>
+            <SelectTrigger className="h-8 w-[110px] text-xs">
+              <SelectValue placeholder="Mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="build" className="text-xs">Build</SelectItem>
+              <SelectItem value="ask" className="text-xs">Ask</SelectItem>
+              <SelectItem value="plan" className="text-xs">Plan</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={model} onValueChange={handleModelChange}>
             <SelectTrigger className="h-8 w-[170px] text-xs">
               <SelectValue placeholder="Model" />
