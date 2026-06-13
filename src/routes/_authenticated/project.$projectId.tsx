@@ -93,11 +93,12 @@ function Workspace() {
       projectId={projectId}
       projectName={data.project.name}
       template={data.project.template}
+      initialPublic={data.project.is_public ?? false}
       initialFiles={Object.fromEntries(data.files.map((f) => [f.path, f.content]))}
       initialMessages={initialMessages}
       // Only auto-run the prompt for a brand-new project with no history yet.
       initialPrompt={initialMessages.length === 0 ? prompt : undefined}
-    />
+    />>
   );
 }
 
