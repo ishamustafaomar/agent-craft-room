@@ -144,6 +144,13 @@ export function ChatPanel({
     submitPrompt(text);
   }
 
+  function handleApproveBlueprint() {
+    if (isBusy) return;
+    submitPrompt(
+      "The app blueprint has been approved. Proceed with the full implementation now.",
+    );
+  }
+
   // Auto-run the prompt the user typed on the dashboard for a fresh project.
   const autoSentRef = useRef(false);
   useEffect(() => {
