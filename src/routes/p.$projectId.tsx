@@ -15,6 +15,11 @@ export const Route = createFileRoute("/p/$projectId")({
         content: "A web app built and shared with Breezy — the friendliest AI builder.",
       },
       { property: "og:title", content: "Built with Breezy" },
+      {
+        property: "og:description",
+        content:
+          "Explore a live, read-only web app built and shared with Breezy — the friendliest AI builder. Describe it, see it, ship it.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),
