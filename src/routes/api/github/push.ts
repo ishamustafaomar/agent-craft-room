@@ -38,8 +38,8 @@ export const Route = createFileRoute("/api/github/push")({
       POST: async ({ request }) => {
         // Require an authenticated Breezy user before acting as a GitHub proxy.
         const authHeader = request.headers.get("authorization") ?? "";
-        const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-        if (!token) {
+        const authToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+        if (!authToken) {
           return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
         const supabaseUrl = process.env.SUPABASE_URL;
