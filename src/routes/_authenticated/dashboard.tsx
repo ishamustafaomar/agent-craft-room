@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   Sparkles,
   Loader2,
