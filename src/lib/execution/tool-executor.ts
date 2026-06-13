@@ -217,7 +217,10 @@ function buildBackendModule(features: string[]): string {
   const wantDb = features.includes("database");
   const parts: string[] = [
     "// Breezy in-browser backend — generated. Persists to localStorage so it",
-    "// works entirely in the preview. Swap for a real backend before shipping.",
+    "// works entirely in the preview. This is a PROTOTYPE store: localStorage is",
+    "// readable by any script on this origin (XSS, extensions), so it is NOT secure",
+    "// for real users. Passwords are salted+hashed (never stored in plaintext), but",
+    "// you MUST swap this for a real server-side backend with proper auth before shipping.",
     "",
     "function read<T>(key: string, fallback: T): T {",
     "  try {",
