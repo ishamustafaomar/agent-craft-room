@@ -83,9 +83,8 @@ function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center gap-2 text-foreground">
-          <Sparkles className="h-6 w-6 text-primary" />
-          <span className="text-xl font-semibold tracking-tight">Forge AI</span>
+        <Link to="/" className="mb-8 flex items-center justify-center text-foreground">
+          <BrandLogo size={32} className="gap-2.5 [&>span]:text-xl" />
         </Link>
         <Card className="p-8">
           <h1 className="text-2xl font-semibold tracking-tight">
