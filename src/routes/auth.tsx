@@ -82,16 +82,16 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-breezy-mesh px-4 text-[oklch(0.22_0.03_280)]">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center text-foreground">
+        <Link to="/" className="mb-8 flex items-center justify-center text-[oklch(0.22_0.03_280)]">
           <BrandLogo size={32} className="gap-2.5 [&>span]:text-xl" />
         </Link>
-        <Card className="p-8">
-          <h1 className="text-2xl font-semibold tracking-tight">
+        <Card className="border-white/60 bg-white/70 p-8 shadow-soft backdrop-blur">
+          <h1 className="text-2xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)]">
             {mode === "signin" ? "Welcome back" : "Create your account"}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-[oklch(0.4_0.03_280)]">
             {mode === "signin"
               ? "Sign in to keep building."
               : "Start building apps with AI in seconds."}
@@ -100,7 +100,7 @@ function AuthPage() {
           <Button
             type="button"
             variant="outline"
-            className="mt-6 w-full"
+            className="mt-6 w-full border-[oklch(0.22_0.03_280/0.15)] bg-white/60 text-[oklch(0.22_0.03_280)] hover:bg-white"
             onClick={handleGoogle}
             disabled={googleLoading}
           >
@@ -112,10 +112,10 @@ function AuthPage() {
             Continue with Google
           </Button>
 
-          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-            <div className="h-px flex-1 bg-border" />
+          <div className="my-5 flex items-center gap-3 text-xs text-[oklch(0.45_0.03_280)]">
+            <div className="h-px flex-1 bg-[oklch(0.22_0.03_280/0.12)]" />
             or
-            <div className="h-px flex-1 bg-border" />
+            <div className="h-px flex-1 bg-[oklch(0.22_0.03_280/0.12)]" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
