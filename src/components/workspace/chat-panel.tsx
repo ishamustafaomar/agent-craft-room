@@ -22,10 +22,13 @@ interface ChatPanelProps {
   projectName: string;
   template: string;
   model: string;
+  mode: "build" | "ask" | "plan";
   runtime: Runtime;
   initialMessages: UIMessage[];
   initialPrompt?: string;
   getFileTree: () => string;
+  getAiRules: () => string;
+  onExitPlan?: () => void;
   onCommandOutput?: (chunk: string) => void;
 }
 
@@ -34,10 +37,13 @@ export function ChatPanel({
   projectName,
   template,
   model,
+  mode,
   runtime,
   initialMessages,
   initialPrompt,
   getFileTree,
+  getAiRules,
+  onExitPlan,
   onCommandOutput,
 }: ChatPanelProps) {
   const [input, setInput] = useState("");
