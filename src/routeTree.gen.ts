@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
+import { Route as BlogHowToBuildWebAppWithAiRouteImport } from './routes/blog.how-to-build-web-app-with-ai'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiGithubPushRouteImport } from './routes/api/github/push'
@@ -43,6 +44,12 @@ const PProjectIdRoute = PProjectIdRouteImport.update({
   path: '/p/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogHowToBuildWebAppWithAiRoute =
+  BlogHowToBuildWebAppWithAiRouteImport.update({
+    id: '/blog/how-to-build-web-app-with-ai',
+    path: '/blog/how-to-build-web-app-with-ai',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/chat': typeof ApiChatRoute
+  '/blog/how-to-build-web-app-with-ai': typeof BlogHowToBuildWebAppWithAiRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
   '/api/github/push': typeof ApiGithubPushRoute
@@ -81,6 +89,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/chat': typeof ApiChatRoute
+  '/blog/how-to-build-web-app-with-ai': typeof BlogHowToBuildWebAppWithAiRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
   '/api/github/push': typeof ApiGithubPushRoute
@@ -93,6 +102,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/api/chat': typeof ApiChatRoute
+  '/blog/how-to-build-web-app-with-ai': typeof BlogHowToBuildWebAppWithAiRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
   '/api/github/push': typeof ApiGithubPushRoute
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/api/chat'
+    | '/blog/how-to-build-web-app-with-ai'
     | '/p/$projectId'
     | '/project/$projectId'
     | '/api/github/push'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/api/chat'
+    | '/blog/how-to-build-web-app-with-ai'
     | '/p/$projectId'
     | '/project/$projectId'
     | '/api/github/push'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/dashboard'
     | '/api/chat'
+    | '/blog/how-to-build-web-app-with-ai'
     | '/p/$projectId'
     | '/_authenticated/project/$projectId'
     | '/api/github/push'
@@ -137,6 +150,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
+  BlogHowToBuildWebAppWithAiRoute: typeof BlogHowToBuildWebAppWithAiRoute
   PProjectIdRoute: typeof PProjectIdRoute
   ApiGithubPushRoute: typeof ApiGithubPushRoute
 }
@@ -176,6 +190,13 @@ declare module '@tanstack/react-router' {
       path: '/p/$projectId'
       fullPath: '/p/$projectId'
       preLoaderRoute: typeof PProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/how-to-build-web-app-with-ai': {
+      id: '/blog/how-to-build-web-app-with-ai'
+      path: '/blog/how-to-build-web-app-with-ai'
+      fullPath: '/blog/how-to-build-web-app-with-ai'
+      preLoaderRoute: typeof BlogHowToBuildWebAppWithAiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -228,9 +249,20 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
+  BlogHowToBuildWebAppWithAiRoute: BlogHowToBuildWebAppWithAiRoute,
   PProjectIdRoute: PProjectIdRoute,
   ApiGithubPushRoute: ApiGithubPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
