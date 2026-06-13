@@ -323,11 +323,16 @@ function WorkspaceInner({
             projectName={projectName}
             template={template}
             model={model}
+            mode={agentMode}
             runtime={runtime}
             initialMessages={initialMessages}
             initialPrompt={initialPrompt}
             getFileTree={() => Object.keys(filesRef.current).sort().join("\n")}
+            getAiRules={() => filesRef.current["AI_RULES.md"] ?? ""}
+            onExitPlan={() => handleModeChange("build")}
+            onCommandOutput={appendTerminal}
           />
+
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={40} minSize={28}>
