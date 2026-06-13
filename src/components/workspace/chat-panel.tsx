@@ -130,9 +130,10 @@ export function ChatPanel({
     }));
     const timer = setTimeout(() => {
       saveMessages({ data: { projectId, messages: rows } }).catch(() => {});
+      onTurnSettled?.();
     }, 600);
     return () => clearTimeout(timer);
-  }, [status, messages, projectId]);
+  }, [status, messages, projectId, onTurnSettled]);
 
   function submitPrompt(text: string) {
     sendMessage(
