@@ -252,7 +252,42 @@ function WorkspaceInner({
         <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
           {template}
         </span>
+
+        <div className="ml-auto flex items-center gap-2">
+          <Select value={model} onValueChange={handleModelChange}>
+            <SelectTrigger className="h-8 w-[170px] text-xs">
+              <SelectValue placeholder="Model" />
+            </SelectTrigger>
+            <SelectContent>
+              {MODEL_GROUPS.map((group) => (
+                <SelectGroup key={group.provider}>
+                  <SelectLabel>{group.provider}</SelectLabel>
+                  {group.models.map((m) => (
+                    <SelectItem key={m.id} value={m.id} className="text-xs">
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5"
+            onClick={handleExport}
+            disabled={exporting}
+          >
+            {exporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Download className="h-3.5 w-3.5" />
+            )}
+            Export
+          </Button>
+        </div>
       </header>
+
 
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
         <ResizablePanel defaultSize={32} minSize={22}>
