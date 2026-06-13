@@ -13,7 +13,7 @@ import { BrandLogo } from "@/components/brand-logo";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in · Forge AI" },
+      { title: "Sign in · Breezy" },
       { name: "description", content: "Sign in to build full-stack apps with an AI coding agent." },
     ],
   }),
