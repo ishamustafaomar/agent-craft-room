@@ -32,6 +32,8 @@ import { MODEL_GROUPS, DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, Download } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { ShareDialog } from "@/components/workspace/share-dialog";
+import { VersionHistory } from "@/components/workspace/version-history";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
   validateSearch: (search: Record<string, unknown>) => ({
