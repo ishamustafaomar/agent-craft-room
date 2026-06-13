@@ -23,6 +23,7 @@ interface ChatPanelProps {
   model: string;
   runtime: Runtime;
   initialMessages: UIMessage[];
+  initialPrompt?: string;
   getFileTree: () => string;
   onCommandOutput?: (chunk: string) => void;
 }
@@ -34,6 +35,7 @@ export function ChatPanel({
   model,
   runtime,
   initialMessages,
+  initialPrompt,
   getFileTree,
   onCommandOutput,
 }: ChatPanelProps) {
