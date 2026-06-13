@@ -59,6 +59,13 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-breezy-peach: var(--breezy-peach);
+  --color-breezy-lavender: var(--breezy-lavender);
+  --color-breezy-mint: var(--breezy-mint);
+  --color-breezy-blue: var(--breezy-blue);
+  --color-breezy-pink: var(--breezy-pink);
+  --color-breezy-yellow: var(--breezy-yellow);
+  --font-display: var(--font-serif-display);
 }
 
 :root {
@@ -95,6 +102,25 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+
+  /* Breezy pastel brand palette (from the dreamy gradient artwork) */
+  --breezy-peach: oklch(0.91 0.05 55);
+  --breezy-lavender: oklch(0.86 0.06 300);
+  --breezy-mint: oklch(0.9 0.07 165);
+  --breezy-blue: oklch(0.85 0.07 245);
+  --breezy-pink: oklch(0.84 0.08 20);
+  --breezy-yellow: oklch(0.93 0.09 95);
+  --font-serif-display: "Playfair Display", ui-serif, Georgia, serif;
+
+  /* Soft pastel mesh used on marketing surfaces */
+  --gradient-breezy: linear-gradient(
+    135deg,
+    oklch(0.96 0.04 60) 0%,
+    oklch(0.95 0.05 320) 35%,
+    oklch(0.95 0.05 200) 65%,
+    oklch(0.95 0.06 150) 100%
+  );
+  --shadow-soft: 0 20px 60px -20px color-mix(in oklab, var(--breezy-lavender) 50%, transparent);
 }
 
 .dark {
@@ -140,5 +166,19 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-serif-display);
+  }
+
+  .bg-breezy-mesh {
+    background-image: var(--gradient-breezy);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
   }
 }
