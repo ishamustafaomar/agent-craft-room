@@ -141,6 +141,7 @@ function baseViteFiles(heading: string, sub: string): TemplateFile[] {
     { path: "src/main.tsx", content: VITE_MAIN },
     { path: "src/index.css", content: VITE_CSS },
     { path: "src/App.tsx", content: viteApp(heading, sub) },
+    { path: "AI_RULES.md", content: AI_RULES_MD },
   ];
 }
 
