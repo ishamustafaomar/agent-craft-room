@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand-logo";
+import { TemplateGallery } from "@/components/workspace/template-gallery";
 import {
   Sparkles,
   Loader2,
