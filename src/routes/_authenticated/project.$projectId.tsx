@@ -121,6 +121,47 @@ function WorkspaceInner({
   const [wcStatus, setWcStatus] = useState<WCStatus>("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [supported, setSupported] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  // Per-project model selection, persisted in the browser.
+  const modelStorageKey = `forge:model:${projectId}`;
+  const [model, setModel] = useState<string>(() => {
+    if (typeof window === "undefined") return DEFAULT_MODEL;
+    const saved = window.localStorage.getItem(modelStorageKey);
+    return saved && isValidModel(saved) ? saved : DEFAULT_MODEL;
+  });
+
+  function handleModelChange(next: string) {
+    setModel(next);
+    try {
+      window.localStorage.setItem(modelStorageKey, next);
+    } catch {
+      /* ignore storage failures */
+    }
+  }
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+      for (const [path, content] of Object.entries(filesRef.current)) {
+        zip.file(path, content);
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "project"}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }
+
 
   const filesRef = useRef<FileMap>(initialFiles);
   filesRef.current = files;
