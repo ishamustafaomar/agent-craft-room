@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in · Forge AI" },
+      { title: "Sign in · Breezy" },
       { name: "description", content: "Sign in to build full-stack apps with an AI coding agent." },
     ],
   }),
@@ -83,9 +84,8 @@ function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center gap-2 text-foreground">
-          <Sparkles className="h-6 w-6 text-primary" />
-          <span className="text-xl font-semibold tracking-tight">Forge AI</span>
+        <Link to="/" className="mb-8 flex items-center justify-center text-foreground">
+          <BrandLogo size={32} className="gap-2.5 [&>span]:text-xl" />
         </Link>
         <Card className="p-8">
           <h1 className="text-2xl font-semibold tracking-tight">

@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   Sparkles,
   Loader2,
@@ -63,7 +64,7 @@ function Dashboard() {
   const renameFn = useServerFn(renameProject);
 
   const [prompt, setPrompt] = useState("");
-  const [template, setTemplate] = useState("blank");
+  const [template] = useState("blank");
   const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
 
@@ -131,9 +132,8 @@ function Dashboard() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <span className="font-semibold tracking-tight">Forge AI</span>
+          <Link to="/dashboard" className="flex items-center">
+            <BrandLogo size={26} />
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -178,24 +178,7 @@ function Dashboard() {
               placeholder="e.g. A habit tracker with streaks, reminders, and a weekly chart"
               className="min-h-[88px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
             />
-            <div className="flex items-center justify-between gap-2 px-1 pt-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {Object.values(TEMPLATES).map((tpl) => (
-                  <button
-                    key={tpl.id}
-                    type="button"
-                    onClick={() => setTemplate(tpl.id)}
-                    title={tpl.description}
-                    className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
-                      template === tpl.id
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border text-muted-foreground hover:border-muted-foreground/40"
-                    }`}
-                  >
-                    {tpl.name}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center justify-end gap-2 px-1 pt-1">
               <Button
                 size="icon"
                 onClick={handleCreateFromPrompt}

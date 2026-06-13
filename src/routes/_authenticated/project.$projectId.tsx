@@ -30,7 +30,8 @@ import {
 } from "@/components/ui/select";
 import { MODEL_GROUPS, DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 import { toast } from "sonner";
-import { Sparkles, Loader2, ArrowLeft, Download } from "lucide-react";
+import { Loader2, ArrowLeft, Download } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -264,7 +265,7 @@ function WorkspaceInner({
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <Sparkles className="h-4 w-4 text-primary" />
+        <BrandLogo size={18} showWordmark={false} />
         <span className="text-sm font-medium">{projectName}</span>
         <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
           {template}

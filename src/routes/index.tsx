@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   Sparkles,
   MessagesSquare,
@@ -15,16 +16,16 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Forge AI — Build full-stack apps by chatting with an AI agent" },
+      { title: "Breezy — Vibe-code beautiful apps in minutes" },
       {
         name: "description",
         content:
-          "Forge AI is an AI coding agent that turns prompts into working full-stack apps. Chat, generate files, run commands, and preview live.",
+          "Breezy is the friendliest AI builder for shipping web apps. Describe it, see it, ship it — files, commands, and a live preview in your browser.",
       },
-      { property: "og:title", content: "Forge AI — AI coding agent" },
+      { property: "og:title", content: "Breezy — Vibe-code beautiful apps in minutes" },
       {
         property: "og:description",
-        content: "Turn prompts into working full-stack apps with a real AI coding agent.",
+        content: "The friendliest AI builder for shipping web apps. Describe it, see it, ship it.",
       },
     ],
   }),
@@ -42,10 +43,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <span className="font-semibold tracking-tight">Forge AI</span>
-        </div>
+        <BrandLogo size={28} />
         <nav className="flex items-center gap-2">
           {signedIn ? (
             <Button onClick={() => navigate({ to: "/dashboard" })} className="gap-2">
@@ -67,17 +65,17 @@ function Landing() {
       <main>
         <section className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center">
           <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 text-primary" /> AI coding agent · live in your browser
+            <Zap className="h-3.5 w-3.5 text-primary" /> The friendliest AI builder · live in your browser
           </div>
           <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-            Build full-stack apps by{" "}
-            <span className="bg-gradient-to-r from-primary to-[oklch(0.72_0.18_300)] bg-clip-text text-transparent">
-              chatting
+            Vibe-code beautiful apps{" "}
+            <span className="bg-gradient-to-r from-primary to-[oklch(0.72_0.14_220)] bg-clip-text text-transparent">
+              in minutes
             </span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-muted-foreground">
-            Describe what you want. The agent reasons, writes files, runs commands, and shows
-            you a live preview — Lovable, Cursor, and Replit Agent in one.
+            Breezy is the friendliest AI builder for shipping web apps. Describe it,
+            see it, ship it — files, commands, and a live preview, all in your browser.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3">
             <Link to={signedIn ? "/dashboard" : "/auth"}>
@@ -106,7 +104,7 @@ function Landing() {
 
       <footer className="border-t border-border">
         <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground">
-          Forge AI — your AI coding agent.
+          Breezy — vibe-code beautiful apps in minutes.
         </div>
       </footer>
     </div>
