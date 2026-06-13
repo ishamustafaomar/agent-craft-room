@@ -223,6 +223,11 @@ function Dashboard() {
                 </button>
               }
             />
+            <DesignDirections
+              onApply={(brief) =>
+                setPrompt((cur) => (cur.trim() ? `${cur.trim()}\n\n${brief}` : brief))
+              }
+            />
           </div>
         </section>
 
