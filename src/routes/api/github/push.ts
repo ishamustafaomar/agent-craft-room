@@ -36,6 +36,26 @@ export const Route = createFileRoute("/api/github/push")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Require an authenticated Breezy user before acting as a GitHub proxy.
+        const authHeader = request.headers.get("authorization") ?? "";
+        const authToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+        if (!authToken) {
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+        if (!supabaseUrl || !supabaseKey) {
+          return Response.json({ error: "Server not configured" }, { status: 500 });
+        }
+        const { createClient } = await import("@supabase/supabase-js");
+        const authClient = createClient(supabaseUrl, supabaseKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+        const { data: userData, error: userError } = await authClient.auth.getUser(authToken);
+        if (userError || !userData.user) {
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         let parsed: z.infer<typeof BodySchema>;
         try {
           parsed = BodySchema.parse(await request.json());

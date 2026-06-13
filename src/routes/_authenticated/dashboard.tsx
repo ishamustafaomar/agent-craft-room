@@ -92,7 +92,7 @@ function Dashboard() {
       navigate({
         to: "/project/$projectId",
         params: { projectId: project.id },
-        search: promptText ? { prompt: promptText } : {},
+        search: { prompt: promptText || undefined },
       });
       void vars;
     },
@@ -263,7 +263,7 @@ function Dashboard() {
                   key={p.id}
                   className="group relative cursor-pointer border-white/60 bg-white/60 p-5 shadow-soft backdrop-blur transition-colors hover:bg-white/80"
                   onClick={() =>
-                    navigate({ to: "/project/$projectId", params: { projectId: p.id } })
+                    navigate({ to: "/project/$projectId", params: { projectId: p.id }, search: { prompt: undefined } })
                   }
                 >
                   <div className="flex items-start justify-between">
