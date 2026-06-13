@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand-logo";
 import { TemplateGallery } from "@/components/workspace/template-gallery";
+import { DesignDirections } from "@/components/workspace/design-directions";
 import {
   Sparkles,
   Loader2,
