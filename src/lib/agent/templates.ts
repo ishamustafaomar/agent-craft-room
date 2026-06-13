@@ -1,4 +1,6 @@
 // Starter templates used to seed a new project's virtual file system.
+import { DEFAULT_AI_RULES } from "./system-prompt";
+
 export interface TemplateFile {
   path: string;
   content: string;
@@ -10,6 +12,10 @@ export interface Template {
   description: string;
   files: TemplateFile[];
 }
+
+// Persistent per-project agent guidance, injected into every system prompt.
+const AI_RULES_MD = DEFAULT_AI_RULES + "\n";
+
 
 const VITE_INDEX_HTML = `<!doctype html>
 <html lang="en">
@@ -135,6 +141,7 @@ function baseViteFiles(heading: string, sub: string): TemplateFile[] {
     { path: "src/main.tsx", content: VITE_MAIN },
     { path: "src/index.css", content: VITE_CSS },
     { path: "src/App.tsx", content: viteApp(heading, sub) },
+    { path: "AI_RULES.md", content: AI_RULES_MD },
   ];
 }
 
@@ -149,6 +156,7 @@ function customViteFiles(app: string, css: string): TemplateFile[] {
     { path: "src/main.tsx", content: VITE_MAIN },
     { path: "src/index.css", content: css },
     { path: "src/App.tsx", content: app },
+    { path: "AI_RULES.md", content: AI_RULES_MD },
   ];
 }
 

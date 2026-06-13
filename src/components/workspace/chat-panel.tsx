@@ -22,10 +22,13 @@ interface ChatPanelProps {
   projectName: string;
   template: string;
   model: string;
+  mode: "build" | "ask" | "plan";
   runtime: Runtime;
   initialMessages: UIMessage[];
   initialPrompt?: string;
   getFileTree: () => string;
+  getAiRules: () => string;
+  onExitPlan?: () => void;
   onCommandOutput?: (chunk: string) => void;
 }
 
@@ -34,10 +37,13 @@ export function ChatPanel({
   projectName,
   template,
   model,
+  mode,
   runtime,
   initialMessages,
   initialPrompt,
   getFileTree,
+  getAiRules,
+  onExitPlan,
   onCommandOutput,
 }: ChatPanelProps) {
   const [input, setInput] = useState("");
@@ -55,7 +61,18 @@ export function ChatPanel({
         return token ? { Authorization: `Bearer ${token}` } : {};
       },
     }),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: ({ messages: msgs }) => {
+      // Terminal tools end the turn so the user can review/approve before the
+      // agent continues (or the mode switches).
+      const last = msgs[msgs.length - 1];
+      if (last?.role === "assistant") {
+        const hasTerminalTool = last.parts.some((p) =>
+          ["tool-write_app_blueprint", "tool-write_plan", "tool-exit_plan"].includes(p.type),
+        );
+        if (hasTerminalTool) return false;
+      }
+      return lastAssistantMessageIsCompleteWithToolCalls({ messages: msgs });
+    },
     onToolCall: async ({ toolCall }) => {
       if (toolCall.dynamic) return;
       try {
@@ -65,6 +82,7 @@ export function ChatPanel({
           onSummary: (summary) => {
             updateChatSummary({ data: { projectId, summary } }).catch(() => {});
           },
+          onExitPlan,
         });
         addToolOutput({
           tool: toolCall.toolName,
@@ -122,7 +140,9 @@ export function ChatPanel({
           projectName,
           template,
           model,
+          mode,
           fileTree: getFileTree(),
+          aiRules: getAiRules(),
         },
       },
     );
@@ -133,6 +153,13 @@ export function ChatPanel({
     if (!text || isBusy) return;
     setInput("");
     submitPrompt(text);
+  }
+
+  function handleApproveBlueprint() {
+    if (isBusy) return;
+    submitPrompt(
+      "The app blueprint has been approved. Proceed with the full implementation now.",
+    );
   }
 
   // Auto-run the prompt the user typed on the dashboard for a fresh project.
@@ -165,8 +192,16 @@ export function ChatPanel({
               </p>
             </div>
           )}
-          {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+          {messages.map((message, idx) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              onApproveBlueprint={
+                !isBusy && idx === messages.length - 1
+                  ? handleApproveBlueprint
+                  : undefined
+              }
+            />
           ))}
           {status === "submitted" && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -211,7 +246,13 @@ export function ChatPanel({
   );
 }
 
-function MessageBubble({ message }: { message: UIMessage }) {
+function MessageBubble({
+  message,
+  onApproveBlueprint,
+}: {
+  message: UIMessage;
+  onApproveBlueprint?: () => void;
+}) {
   const isUser = message.role === "user";
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
@@ -233,7 +274,9 @@ function MessageBubble({ message }: { message: UIMessage }) {
             );
           }
           if (part.type.startsWith("tool-")) {
-            return <ToolActivity key={i} part={part} />;
+            return (
+              <ToolActivity key={i} part={part} onApproveBlueprint={onApproveBlueprint} />
+            );
           }
           return null;
         })}

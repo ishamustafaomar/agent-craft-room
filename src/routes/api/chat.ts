@@ -8,27 +8,31 @@ import {
   withLovableAiGatewayRunIdHeader,
   LOVABLE_AIG_RUN_ID_HEADER,
 } from "@/lib/ai-gateway.server";
-import { agentTools } from "@/lib/agent/tools";
+import { getToolsForMode, type AgentMode } from "@/lib/agent/tools";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
+import { compactHistory } from "@/lib/agent/compaction";
 import { DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 
 interface ChatRequestBody {
   messages?: unknown;
   model?: unknown;
+  mode?: unknown;
   projectName?: unknown;
   template?: unknown;
   fileTree?: unknown;
+  aiRules?: unknown;
 }
 
-// Keep the most recent turns so long conversations stay within context limits.
-// The agent persists a running summary via the set_chat_summary tool, so older
-// detail is not lost from the product, only from the model's working window.
-const MAX_HISTORY_MESSAGES = 40;
+const VALID_MODES: AgentMode[] = ["build", "ask", "plan"];
 
-function compactHistory(messages: UIMessage[]): UIMessage[] {
-  if (messages.length <= MAX_HISTORY_MESSAGES) return messages;
-  return messages.slice(-MAX_HISTORY_MESSAGES);
+function parseMode(value: unknown): AgentMode {
+  return typeof value === "string" && (VALID_MODES as string[]).includes(value)
+    ? (value as AgentMode)
+    : "build";
 }
+
+
+
 
 function describeStreamError(error: unknown): string {
   const text =
@@ -88,22 +92,26 @@ export const Route = createFileRoute("/api/chat")({
             ? body.model
             : DEFAULT_MODEL;
 
+        const mode = parseMode(body.mode);
+
         const system = buildSystemPrompt({
+          mode,
           projectName: typeof body.projectName === "string" ? body.projectName : undefined,
           template: typeof body.template === "string" ? body.template : undefined,
           fileTree: typeof body.fileTree === "string" ? body.fileTree : undefined,
+          aiRules: typeof body.aiRules === "string" ? body.aiRules : undefined,
         });
 
         const initialRunId = getLovableAiGatewayRunId(request);
         const gateway = createLovableAiGatewayProvider(key, initialRunId);
 
-        const history = compactHistory(messages as UIMessage[]);
+        const history = await compactHistory(messages as UIMessage[], gateway);
 
         const result = streamText({
           model: gateway(model),
           system,
           messages: await convertToModelMessages(history),
-          tools: agentTools,
+          tools: getToolsForMode(mode),
           stopWhen: stepCountIs(50),
         });
 

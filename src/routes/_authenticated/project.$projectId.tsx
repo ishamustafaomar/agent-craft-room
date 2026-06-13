@@ -123,6 +123,23 @@ function WorkspaceInner({
   const [supported, setSupported] = useState(false);
   const [exporting, setExporting] = useState(false);
 
+  // Per-project agent mode (build/ask/plan), persisted in the browser.
+  const modeStorageKey = `forge:mode:${projectId}`;
+  const [agentMode, setAgentMode] = useState<"build" | "ask" | "plan">(() => {
+    if (typeof window === "undefined") return "build";
+    const saved = window.localStorage.getItem(modeStorageKey);
+    return saved === "ask" || saved === "plan" ? saved : "build";
+  });
+
+  function handleModeChange(next: "build" | "ask" | "plan") {
+    setAgentMode(next);
+    try {
+      window.localStorage.setItem(modeStorageKey, next);
+    } catch {
+      /* ignore storage failures */
+    }
+  }
+
   // Per-project model selection, persisted in the browser.
   const modelStorageKey = `forge:model:${projectId}`;
   const [model, setModel] = useState<string>(() => {
@@ -254,6 +271,16 @@ function WorkspaceInner({
         </span>
 
         <div className="ml-auto flex items-center gap-2">
+          <Select value={agentMode} onValueChange={handleModeChange}>
+            <SelectTrigger className="h-8 w-[110px] text-xs">
+              <SelectValue placeholder="Mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="build" className="text-xs">Build</SelectItem>
+              <SelectItem value="ask" className="text-xs">Ask</SelectItem>
+              <SelectItem value="plan" className="text-xs">Plan</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={model} onValueChange={handleModelChange}>
             <SelectTrigger className="h-8 w-[170px] text-xs">
               <SelectValue placeholder="Model" />
@@ -296,11 +323,16 @@ function WorkspaceInner({
             projectName={projectName}
             template={template}
             model={model}
+            mode={agentMode}
             runtime={runtime}
             initialMessages={initialMessages}
             initialPrompt={initialPrompt}
             getFileTree={() => Object.keys(filesRef.current).sort().join("\n")}
+            getAiRules={() => filesRef.current["AI_RULES.md"] ?? ""}
+            onExitPlan={() => handleModeChange("build")}
+            onCommandOutput={appendTerminal}
           />
+
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={40} minSize={28}>
