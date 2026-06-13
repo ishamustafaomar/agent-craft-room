@@ -30,6 +30,7 @@ interface ChatPanelProps {
   getAiRules: () => string;
   onExitPlan?: () => void;
   onCommandOutput?: (chunk: string) => void;
+  onTurnSettled?: () => void;
 }
 
 export function ChatPanel({
