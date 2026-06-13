@@ -117,6 +117,15 @@ You are in Plan mode — a collaborative planning assistant. Your goal is to ful
 - Keep plans clear, actionable, and well-structured.
 </plan_constraints>`;
 
+const APP_BLUEPRINT_BLOCK = `<app_blueprint>
+When the user asks to create a NEW app from scratch (the project is empty or only contains the default starter template), present an app blueprint BEFORE writing any feature code:
+1. If design preferences are unclear, ask 1-3 quick questions about look/feel, audience, or color — not technical questions.
+2. Call \`write_app_blueprint\` with a creative app name, a concise design direction, a fitting primary color, and image prompts for any visual assets the app needs.
+This ends your turn. The user reviews the blueprint card and approves it; once approved (the next user message will say the blueprint was approved), begin implementation using those decisions.
+
+Skip the blueprint for small changes, edits to an existing app, or when the user explicitly says to just build it.
+</app_blueprint>`;
+
 function projectContextBlock(opts: SystemPromptOptions): string {
   const { projectName = "Untitled App", template = "blank", fileTree } = opts;
   return `<current_project>
