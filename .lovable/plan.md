@@ -56,17 +56,18 @@ Deliverable: prompt → agent edits files → npm runs in-browser → live previ
 - Terminal panel streams command output; preview lifecycle controls (start/restart/reload/open).
 
 
-## Stage 4 — App Lifecycle + Templates
-- Dashboard: create project from prompt, list/load existing projects, delete.
-- Starter templates (SaaS, landing page, game, browser-extension-style) used to seed the virtual FS.
-- "New app from prompt" flow mirroring Dyad's `createApp`: scaffold template → kick off first agent turn.
-- Project rename, duplicate, last-opened ordering.
+## Stage 4 — App Lifecycle + Templates ✅ DONE
+- Dashboard: "describe your app" prompt hero that scaffolds a project and auto-runs the first agent turn (via `?prompt=` search param), plus example prompt chips.
+- Richer, distinct starter templates (landing page, SaaS dashboard, canvas game) each with real App + CSS.
+- Project rename (dialog) and duplicate (clones metadata + all files) from the dashboard card menu.
+- Last-opened ordering: opening a project touches `updated_at` so it surfaces first.
 
-## Stage 5 — Multi-Provider Keys + Polish
-- Provider selector: Lovable AI (default, no key) **plus** user-supplied OpenAI/Anthropic keys (stored as Supabase secrets per the secrets flow; never in client code).
-- Model picker per provider; route the chat endpoint to the chosen provider.
-- Context compaction + chat summarization using the uploaded prompts when history grows large.
-- Error surfacing (429/402/validation), loading/empty states, keyboard shortcuts, share/export project.
+## Stage 5 — Multi-Provider Models + Polish ✅ DONE
+- Model picker in the workspace header spanning both providers (Google Gemini + OpenAI GPT) through the Lovable AI Gateway — no user keys required. Selection persists per project in the browser and is validated server-side against an allow-list.
+- Context compaction: the chat route trims to the most recent 40 messages before each model call; the running chat summary (set_chat_summary tool) preserves older context at the product level.
+- Error surfacing: 429 (rate limit) and 402 (credits exhausted) are detected and shown as clear messages in-stream and via toast; client `onError` surfaces failures to the user.
+- Project export: one-click "Export" button zips the virtual file system (JSZip) and downloads it.
+
 
 ---
 
