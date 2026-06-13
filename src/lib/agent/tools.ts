@@ -193,6 +193,7 @@ const BUILD_TOOLS: AgentToolName[] = [
   "delete_file",
   "add_dependency",
   "run_command",
+  "write_app_blueprint",
 ];
 
 const PLAN_TOOLS: AgentToolName[] = [...READ_ONLY_TOOLS, "write_plan", "exit_plan"];
