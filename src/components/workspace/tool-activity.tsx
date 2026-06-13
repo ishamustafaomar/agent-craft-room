@@ -155,3 +155,59 @@ function PlanCard({ title, plan }: { title: string; plan: string }) {
     </div>
   );
 }
+
+interface BlueprintAsset {
+  name: string;
+  prompt: string;
+}
+
+function BlueprintCard({
+  input,
+  onApprove,
+}: {
+  input: Record<string, unknown>;
+  onApprove?: () => void;
+}) {
+  const appName = String(input.appName ?? "New App");
+  const designDirection = String(input.designDirection ?? "");
+  const primaryColor = typeof input.primaryColor === "string" ? input.primaryColor : "#4f46e5";
+  const assets = Array.isArray(input.assets) ? (input.assets as BlueprintAsset[]) : [];
+
+  return (
+    <div className="my-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2.5 text-xs">
+      <div className="mb-2 flex items-center gap-1.5 font-medium text-primary">
+        <Compass className="h-3.5 w-3.5" /> App blueprint
+      </div>
+      <div className="space-y-1.5">
+        <div className="text-sm font-semibold text-foreground">{appName}</div>
+        {designDirection && <p className="text-muted-foreground">{designDirection}</p>}
+        <div className="flex items-center gap-1.5">
+          <span
+            className="h-3.5 w-3.5 rounded-full border border-border"
+            style={{ backgroundColor: primaryColor }}
+          />
+          <span className="font-mono text-muted-foreground">{primaryColor}</span>
+        </div>
+        {assets.length > 0 && (
+          <ul className="mt-1 list-disc pl-4 text-muted-foreground">
+            {assets.map((a, i) => (
+              <li key={i}>
+                <span className="font-medium text-foreground">{a.name}:</span> {a.prompt}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      {onApprove && (
+        <button
+          type="button"
+          onClick={onApprove}
+          className="mt-2.5 inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
+        >
+          <Rocket className="h-3.5 w-3.5" /> Approve &amp; build
+        </button>
+      )}
+    </div>
+  );
+}
+
