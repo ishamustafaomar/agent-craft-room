@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/github/push")({
         const authClient = createClient(supabaseUrl, supabaseKey, {
           auth: { autoRefreshToken: false, persistSession: false },
         });
-        const { data: userData, error: userError } = await authClient.auth.getUser(token);
+        const { data: userData, error: userError } = await authClient.auth.getUser(authToken);
         if (userError || !userData.user) {
           return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
