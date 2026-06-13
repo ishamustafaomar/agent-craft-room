@@ -258,6 +258,31 @@ function WorkspaceInner({
     runtime.writeFile(path, content);
   }
 
+  // Restore a snapshot: swap in-memory files (DB already updated by the caller).
+  function handleRestoreFiles(next: FileMap) {
+    filesRef.current = next;
+    setFiles(next);
+    setSelectedPath(Object.keys(next).sort()[0] ?? null);
+  }
+
+  // Auto-capture a version when an agent build turn settles (skips no-op turns).
+  const createSnapshotFn = useServerFn(createSnapshot);
+  const lastSnapSig = useRef<string>("");
+  const handleTurnSettled = useCallback(() => {
+    const current = filesRef.current;
+    const sig = Object.keys(current)
+      .sort()
+      .map((k) => `${k}:${current[k].length}`)
+      .join("|");
+    if (sig === lastSnapSig.current) return;
+    lastSnapSig.current = sig;
+    const files = Object.entries(current).map(([path, content]) => ({ path, content }));
+    createSnapshotFn({
+      data: { projectId, label: `Build · ${new Date().toLocaleString()}`, files },
+    }).catch(() => {});
+  }, [projectId, createSnapshotFn]);
+
+
 
 
 
