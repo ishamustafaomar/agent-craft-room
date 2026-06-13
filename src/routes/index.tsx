@@ -41,7 +41,7 @@ function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-breezy-mesh text-[oklch(0.22_0.03_280)]">
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <BrandLogo size={28} />
         <nav className="flex items-center gap-2">
@@ -64,10 +64,7 @@ function Landing() {
 
       <main>
         {/* Dreamy pastel hero — mirrors the Breezy brand artwork */}
-        <section className="bg-breezy-mesh relative overflow-hidden">
-          <div className="absolute inset-x-0 bottom-0 z-0 h-40 bg-gradient-to-b from-transparent to-background" />
-
-
+        <section className="relative overflow-hidden">
           {/* Floating pastel confetti */}
           <span className="absolute left-[12%] top-[22%] h-4 w-4 rounded-full bg-breezy-pink/80" />
           <span className="absolute left-[16%] top-[42%] h-7 w-7 rounded-full bg-breezy-mint/80" />
@@ -105,20 +102,20 @@ function Landing() {
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+              className="rounded-2xl border border-white/60 bg-white/60 p-6 shadow-soft backdrop-blur transition-colors hover:border-white"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <f.icon className="h-5 w-5 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/70">
+                <f.icon className="h-5 w-5 text-[oklch(0.55_0.12_300)]" />
               </div>
-              <h3 className="mt-4 font-medium tracking-tight">{f.title}</h3>
-              <p className="mt-1.5 text-sm text-muted-foreground">{f.desc}</p>
+              <h3 className="mt-4 font-medium tracking-tight text-[oklch(0.22_0.03_280)]">{f.title}</h3>
+              <p className="mt-1.5 text-sm text-[oklch(0.4_0.03_280)]">{f.desc}</p>
             </div>
           ))}
         </section>
       </main>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground">
+      <footer className="border-t border-[oklch(0.22_0.03_280/0.1)]">
+        <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-[oklch(0.4_0.03_280)]">
           Breezy — vibe-code beautiful apps in minutes.
         </div>
       </footer>
