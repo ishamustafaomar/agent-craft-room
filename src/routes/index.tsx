@@ -109,7 +109,7 @@ function Landing() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/70">
                 <f.icon className="h-5 w-5 text-[oklch(0.55_0.12_300)]" />
               </div>
-              <h3 className="mt-4 font-medium tracking-tight text-[oklch(0.22_0.03_280)]">{f.title}</h3>
+              <h2 className="mt-4 font-medium tracking-tight text-[oklch(0.22_0.03_280)]">{f.title}</h2>
               <p className="mt-1.5 text-sm text-[oklch(0.4_0.03_280)]">{f.desc}</p>
             </div>
           ))}
