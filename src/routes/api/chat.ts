@@ -10,6 +10,7 @@ import {
 } from "@/lib/ai-gateway.server";
 import { getToolsForMode, type AgentMode } from "@/lib/agent/tools";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
+import { compactHistory } from "@/lib/agent/compaction";
 import { DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 
 interface ChatRequestBody {
