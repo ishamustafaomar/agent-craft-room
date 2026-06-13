@@ -18,7 +18,19 @@ import type {
 import { ChatPanel } from "@/components/workspace/chat-panel";
 import { EditorPanel } from "@/components/workspace/editor-panel";
 import { PreviewPanel } from "@/components/workspace/preview-panel";
-import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MODEL_GROUPS, DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
+import { toast } from "sonner";
+import { Sparkles, Loader2, ArrowLeft, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/project/$projectId")({
   validateSearch: (search: Record<string, unknown>) => ({
