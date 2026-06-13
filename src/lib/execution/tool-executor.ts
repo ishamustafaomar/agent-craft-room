@@ -181,6 +181,10 @@ export async function executeAgentTool(
       if (args.confirmation) ctx.onExitPlan?.();
       return { ok: true };
     }
+    case "write_app_blueprint": {
+      // Blueprint card is rendered from the tool part; user approves to proceed.
+      return { ok: true };
+    }
     default:
       return { error: `Unknown tool: ${toolName}` };
   }
