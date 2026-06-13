@@ -295,7 +295,7 @@ function WorkspaceInner({
             projectId={projectId}
             projectName={projectName}
             template={template}
-            model={DEFAULT_MODEL}
+            model={model}
             runtime={runtime}
             initialMessages={initialMessages}
             initialPrompt={initialPrompt}
