@@ -64,7 +64,7 @@ function Dashboard() {
   const renameFn = useServerFn(renameProject);
 
   const [prompt, setPrompt] = useState("");
-  const [template, setTemplate] = useState("blank");
+  const [template] = useState("blank");
   const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
 
