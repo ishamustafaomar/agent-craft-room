@@ -92,7 +92,7 @@ function Dashboard() {
       navigate({
         to: "/project/$projectId",
         params: { projectId: project.id },
-        search: promptText ? { prompt: promptText } : {},
+        search: { prompt: promptText || undefined },
       });
       void vars;
     },
