@@ -329,6 +329,12 @@ function WorkspaceInner({
               ))}
             </SelectContent>
           </Select>
+          <VersionHistory
+            projectId={projectId}
+            getFiles={() => filesRef.current}
+            onRestore={handleRestoreFiles}
+          />
+          <ShareDialog projectId={projectId} initialPublic={initialPublic} />
           <Button
             variant="outline"
             size="sm"
