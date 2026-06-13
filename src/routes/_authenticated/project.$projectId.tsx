@@ -106,6 +106,7 @@ function WorkspaceInner({
   projectId,
   projectName,
   template,
+  initialPublic,
   initialFiles,
   initialMessages,
   initialPrompt,
@@ -113,6 +114,7 @@ function WorkspaceInner({
   projectId: string;
   projectName: string;
   template: string;
+  initialPublic: boolean;
   initialFiles: FileMap;
   initialMessages: UIMessage[];
   initialPrompt?: string;
