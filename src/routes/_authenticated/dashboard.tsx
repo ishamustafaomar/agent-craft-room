@@ -178,24 +178,7 @@ function Dashboard() {
               placeholder="e.g. A habit tracker with streaks, reminders, and a weekly chart"
               className="min-h-[88px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
             />
-            <div className="flex items-center justify-between gap-2 px-1 pt-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {Object.values(TEMPLATES).map((tpl) => (
-                  <button
-                    key={tpl.id}
-                    type="button"
-                    onClick={() => setTemplate(tpl.id)}
-                    title={tpl.description}
-                    className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
-                      template === tpl.id
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border text-muted-foreground hover:border-muted-foreground/40"
-                    }`}
-                  >
-                    {tpl.name}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center justify-end gap-2 px-1 pt-1">
               <Button
                 size="icon"
                 onClick={handleCreateFromPrompt}
