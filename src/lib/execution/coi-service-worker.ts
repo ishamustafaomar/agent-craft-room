@@ -1,30 +1,56 @@
-/**
- * Registers a service worker that re-injects COOP/COEP headers so the page
- * becomes cross-origin isolated (window.crossOriginIsolated === true), which
- * the in-browser WebContainer live preview requires.
- *
- * On the published site the server already sets these headers, so this is a
- * no-op there. In environments where an upstream proxy strips the headers
- * (e.g. the Lovable sandbox preview), the service worker supplies them and the
- * page reloads once to take effect.
- *
- * Returns true when the page is already cross-origin isolated.
- */
-export async function registerCoiServiceWorker(): Promise<boolean> {
+const COI_RELOAD_KEY = "breezy:coi-reload:v3";
+
+export function isEmbeddedDocument(): boolean {
   if (typeof window === "undefined") return false;
-  if (window.crossOriginIsolated) return true;
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+function reloadOnce(forceReload = false): boolean {
+  if (forceReload) window.sessionStorage.removeItem(COI_RELOAD_KEY);
+  if (window.sessionStorage.getItem(COI_RELOAD_KEY)) return false;
+  window.sessionStorage.setItem(COI_RELOAD_KEY, "true");
+  window.location.reload();
+  return true;
+}
+
+function waitForController(): Promise<void> {
+  if (navigator.serviceWorker.controller) return Promise.resolve();
+  return new Promise((resolve) => {
+    const timeout = window.setTimeout(resolve, 1500);
+    navigator.serviceWorker.addEventListener(
+      "controllerchange",
+      () => {
+        window.clearTimeout(timeout);
+        resolve();
+      },
+      { once: true },
+    );
+  });
+}
+
+/**
+ * Registers a service worker that re-injects COOP/COEP headers so the page can
+ * become cross-origin isolated for the in-browser WebContainer preview.
+ */
+export async function registerCoiServiceWorker(options?: {
+  forceReload?: boolean;
+}): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  if (window.crossOriginIsolated) {
+    window.sessionStorage.removeItem(COI_RELOAD_KEY);
+    return true;
+  }
 
   if (!("serviceWorker" in navigator)) return false;
 
-  // Avoid a reload loop: only reload once per session attempt.
-  const RELOAD_KEY = "coiReloadedBySelf";
-
-  const reloadOnce = () => {
-    if (window.sessionStorage.getItem(RELOAD_KEY)) return false;
-    window.sessionStorage.setItem(RELOAD_KEY, "true");
-    window.location.reload();
-    return true;
-  };
+  // A child iframe cannot make itself cross-origin isolated if the parent frame
+  // is not isolated too. Avoid a reload loop in embedded preview shells and let
+  // the UI offer a top-level tab instead.
+  if (isEmbeddedDocument()) return false;
 
   try {
     const registration = await navigator.serviceWorker.register("/coi-serviceworker.js", {
@@ -32,22 +58,31 @@ export async function registerCoiServiceWorker(): Promise<boolean> {
     });
 
     await navigator.serviceWorker.ready;
+    await waitForController();
 
-    // The current document was loaded before the service worker could add
-    // COOP/COEP headers, so reload once after the worker is ready. This covers
-    // both first install and clients.claim() cases where a controller exists but
-    // the document response itself is still not cross-origin isolated.
     if (!window.crossOriginIsolated) {
-      reloadOnce();
+      reloadOnce(options?.forceReload);
       return false;
     }
 
     registration.addEventListener("updatefound", () => {
-      reloadOnce();
+      reloadOnce(true);
     });
   } catch (err) {
     console.error("COOP/COEP service worker failed to register:", err);
   }
 
   return window.crossOriginIsolated;
+}
+
+export async function retryCoiIsolation(): Promise<void> {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(COI_RELOAD_KEY);
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration("/");
+    await registration?.update();
+  } catch {
+    /* retry still reloads below */
+  }
+  window.location.reload();
 }

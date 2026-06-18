@@ -126,6 +126,7 @@ function WorkspaceInner({
   const [wcStatus, setWcStatus] = useState<WCStatus>("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [supported, setSupported] = useState(false);
+  const [embedded, setEmbedded] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   // Per-project agent mode (build/plan), persisted in the browser.
@@ -198,9 +199,10 @@ function WorkspaceInner({
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { registerCoiServiceWorker } = await import(
+      const { isEmbeddedDocument, registerCoiServiceWorker } = await import(
         "@/lib/execution/coi-service-worker"
       );
+      if (!cancelled) setEmbedded(isEmbeddedDocument());
       await registerCoiServiceWorker();
       if (cancelled) return;
       const m = await import("@/lib/execution/webcontainer-manager");
@@ -212,6 +214,11 @@ function WorkspaceInner({
       cancelled = true;
     };
   }, []);
+
+  async function handleRetryIsolation() {
+    const { retryCoiIsolation } = await import("@/lib/execution/coi-service-worker");
+    await retryCoiIsolation();
+  }
 
   async function handleStart() {
     setTerminal([]);
@@ -359,7 +366,9 @@ function WorkspaceInner({
             status={wcStatus}
             previewUrl={previewUrl}
             supported={supported}
+            embedded={embedded}
             onStart={handleStart}
+            onRetryIsolation={handleRetryIsolation}
             selectedPath={selectedPath}
             onSelect={setSelectedPath}
             onCreateFile={handleCreateFile}
