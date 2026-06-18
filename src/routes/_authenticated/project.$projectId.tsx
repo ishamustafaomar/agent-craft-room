@@ -298,23 +298,28 @@ function WorkspaceInner({
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border px-4">
+      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card/60 px-3 backdrop-blur sm:px-4">
         <Link
           to="/dashboard"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          className="flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          aria-label="Back to dashboard"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <BrandLogo size={18} showWordmark={false} />
-        <span className="text-sm font-medium">{projectName}</span>
-        <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-          {template}
-        </span>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-sm font-medium">{projectName}</span>
+          <span className="hidden shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground sm:inline">
+            {template}
+          </span>
+        </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <PresenceBar projectId={projectId} />
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="hidden md:block">
+            <PresenceBar projectId={projectId} />
+          </div>
           <Select value={agentMode} onValueChange={handleModeChange}>
-            <SelectTrigger className="h-8 w-[110px] text-xs">
+            <SelectTrigger className="h-8 w-[88px] text-xs sm:w-[110px]">
               <SelectValue placeholder="Mode" />
             </SelectTrigger>
             <SelectContent>
@@ -324,7 +329,7 @@ function WorkspaceInner({
             </SelectContent>
           </Select>
           <Select value={model} onValueChange={handleModelChange}>
-            <SelectTrigger className="h-8 w-[170px] text-xs">
+            <SelectTrigger className="hidden h-8 w-[150px] text-xs lg:flex xl:w-[170px]">
               <SelectValue placeholder="Model" />
             </SelectTrigger>
             <SelectContent>
@@ -340,20 +345,24 @@ function WorkspaceInner({
               ))}
             </SelectContent>
           </Select>
-          <VersionHistory
-            projectId={projectId}
-            getFiles={() => filesRef.current}
-            onRestore={handleRestoreFiles}
-          />
+          <div className="hidden items-center gap-1.5 sm:gap-2 md:flex">
+            <VersionHistory
+              projectId={projectId}
+              getFiles={() => filesRef.current}
+              onRestore={handleRestoreFiles}
+            />
+          </div>
           <ShareDialog projectId={projectId} initialPublic={initialPublic} />
-          <GithubExport
-            getFiles={() => filesRef.current}
-            defaultRepo={projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "breezy-app"}
-          />
+          <div className="hidden items-center gap-1.5 sm:gap-2 lg:flex">
+            <GithubExport
+              getFiles={() => filesRef.current}
+              defaultRepo={projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "breezy-app"}
+            />
+          </div>
           <Button
             variant="outline"
             size="sm"
-            className="h-8 gap-1.5"
+            className="h-8 gap-1.5 px-2 sm:px-3"
             onClick={handleExport}
             disabled={exporting}
           >
@@ -362,7 +371,7 @@ function WorkspaceInner({
             ) : (
               <Download className="h-3.5 w-3.5" />
             )}
-            Export
+            <span className="hidden sm:inline">Export</span>
           </Button>
         </div>
       </header>

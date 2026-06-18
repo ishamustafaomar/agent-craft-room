@@ -184,8 +184,8 @@ export function ChatPanel({
         <span className="text-sm font-medium">AI Agent</span>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div ref={scrollRef} className="flex flex-col gap-4 p-4">
+      <ScrollArea className="min-w-0 flex-1">
+        <div ref={scrollRef} className="flex min-w-0 flex-col gap-4 p-4">
           {messages.length === 0 && (
             <div className="mt-10 text-center text-sm text-muted-foreground">
               <Sparkles className="mx-auto mb-3 h-8 w-8 opacity-50" />
@@ -265,9 +265,9 @@ function MessageBubble({
 }) {
   const isUser = message.role === "user";
   return (
-    <div className={isUser ? "flex justify-end" : "flex justify-start"}>
+    <div className={isUser ? "flex min-w-0 justify-end" : "flex min-w-0 justify-start"}>
       <div
-        className={`max-w-[92%] rounded-2xl px-4 py-2.5 text-sm ${
+        className={`min-w-0 max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-2.5 text-sm ${
           isUser
             ? "bg-primary text-primary-foreground"
             : "bg-muted text-foreground"

@@ -104,7 +104,7 @@ export function ToolActivity({
       <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
       <span className="font-medium">{meta.label}</span>
       {detail && (
-        <span className="truncate font-mono text-muted-foreground" title={detail}>
+        <span className="min-w-0 truncate font-mono text-muted-foreground" title={detail}>
           {detail}
         </span>
       )}
