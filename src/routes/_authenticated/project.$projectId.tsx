@@ -324,73 +324,27 @@ function WorkspaceInner({
           <div className="hidden md:block">
             <PresenceBar projectId={projectId} />
           </div>
-          <Select value={agentMode} onValueChange={handleModeChange}>
-            <SelectTrigger className="h-8 w-[88px] text-xs sm:w-[110px]">
-              <SelectValue placeholder="Mode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="build" className="text-xs">Build</SelectItem>
-              <SelectItem value="ask" className="text-xs">Ask</SelectItem>
-              <SelectItem value="plan" className="text-xs">Plan</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={model} onValueChange={handleModelChange}>
-            <SelectTrigger className="hidden h-8 w-[150px] text-xs lg:flex xl:w-[170px]">
-              <SelectValue placeholder="Model" />
-            </SelectTrigger>
-            <SelectContent>
-              {MODEL_GROUPS.map((group) => (
-                <SelectGroup key={group.provider}>
-                  <SelectLabel>{group.provider}</SelectLabel>
-                  {group.models.map((m) => (
-                    <SelectItem key={m.id} value={m.id} className="text-xs">
-                      {m.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))}
-            </SelectContent>
-          </Select>
-          <div className="hidden items-center gap-1.5 sm:gap-2 md:flex">
-            <VersionHistory
-              projectId={projectId}
-              getFiles={() => filesRef.current}
-              onRestore={handleRestoreFiles}
-            />
-          </div>
-          <ShareDialog projectId={projectId} initialPublic={initialPublic} />
           <div className="hidden items-center gap-1.5 sm:gap-2 lg:flex">
             <GithubExport
               getFiles={() => filesRef.current}
               defaultRepo={projectName.replace(/[^a-z0-9-_]+/gi, "-").toLowerCase() || "breezy-app"}
             />
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-1.5 px-2 sm:px-3"
-            onClick={handleExport}
-            disabled={exporting}
-          >
-            {exporting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Download className="h-3.5 w-3.5" />
-            )}
-            <span className="hidden sm:inline">Export</span>
-          </Button>
+          <ShareDialog projectId={projectId} initialPublic={initialPublic} />
         </div>
       </header>
 
 
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={32} minSize={22}>
+        <ResizablePanel defaultSize={38} minSize={26}>
           <ChatPanel
             projectId={projectId}
             projectName={projectName}
             template={template}
             model={model}
+            onModelChange={handleModelChange}
             mode={agentMode}
+            onModeChange={handleModeChange}
             runtime={runtime}
             initialMessages={initialMessages}
             initialPrompt={initialPrompt}
@@ -399,30 +353,32 @@ function WorkspaceInner({
             onExitPlan={() => handleModeChange("build")}
             onCommandOutput={appendTerminal}
             onTurnSettled={handleTurnSettled}
-          />
-
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={40} minSize={28}>
-          <EditorPanel
-            files={files}
-            selectedPath={selectedPath}
-            onSelect={setSelectedPath}
-            onCreateFile={handleCreateFile}
-            onDeleteFile={handleDeleteFile}
-            onRenameFile={handleRenameFile}
-            onSave={handleSaveFile}
+            headerActions={
+              <VersionHistory
+                projectId={projectId}
+                getFiles={() => filesRef.current}
+                onRestore={handleRestoreFiles}
+              />
+            }
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={28} minSize={18}>
-          <PreviewPanel
+        <ResizablePanel defaultSize={62} minSize={30}>
+          <WorkspacePanel
             files={files}
             terminal={terminal}
             status={wcStatus}
             previewUrl={previewUrl}
             supported={supported}
             onStart={handleStart}
+            selectedPath={selectedPath}
+            onSelect={setSelectedPath}
+            onCreateFile={handleCreateFile}
+            onDeleteFile={handleDeleteFile}
+            onRenameFile={handleRenameFile}
+            onSave={handleSaveFile}
+            onExport={handleExport}
+            exporting={exporting}
           />
         </ResizablePanel>
       </ResizablePanelGroup>
