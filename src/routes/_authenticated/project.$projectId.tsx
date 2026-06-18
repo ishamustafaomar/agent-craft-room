@@ -16,21 +16,10 @@ import type {
   WebContainerManager,
 } from "@/lib/execution/webcontainer-manager";
 import { ChatPanel } from "@/components/workspace/chat-panel";
-import { EditorPanel } from "@/components/workspace/editor-panel";
-import { PreviewPanel } from "@/components/workspace/preview-panel";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { MODEL_GROUPS, DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
+import { WorkspacePanel } from "@/components/workspace/workspace-panel";
+import { DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Download } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShareDialog } from "@/components/workspace/share-dialog";
 import { VersionHistory } from "@/components/workspace/version-history";
