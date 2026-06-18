@@ -106,6 +106,7 @@ export function PreviewPanel({
               Restart
             </Button>
           )}
+          {headerActions}
         </div>
       </div>
 
