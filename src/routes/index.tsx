@@ -40,6 +40,10 @@ function Landing() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(!!session?.user);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   return (
