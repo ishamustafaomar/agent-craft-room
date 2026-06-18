@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
   DefaultChatTransport,
@@ -12,6 +12,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MODEL_GROUPS } from "@/lib/agent/models";
 import { ToolActivity } from "./tool-activity";
 import { MarkdownMessage } from "./markdown-message";
 import { Sparkles, ArrowUp, Loader2, Square } from "lucide-react";
@@ -22,7 +32,9 @@ interface ChatPanelProps {
   projectName: string;
   template: string;
   model: string;
+  onModelChange: (model: string) => void;
   mode: "build" | "ask" | "plan";
+  onModeChange: (mode: "build" | "ask" | "plan") => void;
   runtime: Runtime;
   initialMessages: UIMessage[];
   initialPrompt?: string;
@@ -31,6 +43,7 @@ interface ChatPanelProps {
   onExitPlan?: () => void;
   onCommandOutput?: (chunk: string) => void;
   onTurnSettled?: () => void;
+  headerActions?: ReactNode;
 }
 
 export function ChatPanel({
