@@ -20,7 +20,9 @@ interface PreviewPanelProps {
   status: WCStatus;
   previewUrl: string | null;
   supported: boolean;
+  embedded: boolean;
   onStart: () => void;
+  onRetryIsolation: () => void;
   headerActions?: React.ReactNode;
 }
 
@@ -39,7 +41,9 @@ export function PreviewPanel({
   status,
   previewUrl,
   supported,
+  embedded,
   onStart,
+  onRetryIsolation,
   headerActions,
 }: PreviewPanelProps) {
   const [tab, setTab] = useState<"preview" | "terminal">("preview");
@@ -130,12 +134,28 @@ export function PreviewPanel({
                   <p className="text-sm font-medium">
                     Live preview needs cross-origin isolation
                   </p>
-                  <p className="max-w-xs text-xs text-muted-foreground">
-                    The in-browser sandbox runs on the published site (and any
-                    browser tab that is cross-origin isolated). The agent can still
-                    generate and edit all {fileCount} file
+                  <p className="max-w-sm text-wrap text-xs leading-relaxed text-muted-foreground">
+                    {embedded
+                      ? "Open this workspace in a full browser tab to run the live preview."
+                      : "Breezy is preparing this tab for the in-browser sandbox."}{" "}
+                    The agent can still generate and edit all {fileCount} file
                     {fileCount === 1 ? "" : "s"} here.
                   </p>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    {embedded && (
+                      <Button
+                        variant="secondary"
+                        onClick={() => window.open(window.location.href, "_blank", "noopener,noreferrer")}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open full tab
+                      </Button>
+                    )}
+                    <Button variant={embedded ? "outline" : "secondary"} onClick={onRetryIsolation}>
+                      <RefreshCw className="h-4 w-4" />
+                      Retry preview
+                    </Button>
+                  </div>
                 </>
               ) : isWorking ? (
                 <>
