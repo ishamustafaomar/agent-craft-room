@@ -128,12 +128,12 @@ function WorkspaceInner({
   const [supported, setSupported] = useState(false);
   const [exporting, setExporting] = useState(false);
 
-  // Per-project agent mode (build/ask/plan), persisted in the browser.
+  // Per-project agent mode (build/plan), persisted in the browser.
   const modeStorageKey = `forge:mode:${projectId}`;
   const [agentMode, setAgentMode] = useState<"build" | "ask" | "plan">(() => {
     if (typeof window === "undefined") return "build";
     const saved = window.localStorage.getItem(modeStorageKey);
-    return saved === "ask" || saved === "plan" ? saved : "build";
+    return saved === "plan" ? "plan" : "build";
   });
 
   function handleModeChange(next: "build" | "ask" | "plan") {
