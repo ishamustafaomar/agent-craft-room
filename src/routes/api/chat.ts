@@ -87,10 +87,9 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
 
-        const model =
-          typeof body.model === "string" && isValidModel(body.model)
-            ? body.model
-            : DEFAULT_MODEL;
+        const model = resolveModel(
+          typeof body.model === "string" ? body.model : undefined,
+        );
 
         const mode = parseMode(body.mode);
 
