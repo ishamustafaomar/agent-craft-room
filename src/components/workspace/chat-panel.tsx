@@ -184,8 +184,8 @@ export function ChatPanel({
         <span className="text-sm font-medium">AI Agent</span>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div ref={scrollRef} className="flex flex-col gap-4 p-4">
+      <ScrollArea className="min-w-0 flex-1">
+        <div ref={scrollRef} className="flex min-w-0 flex-col gap-4 p-4">
           {messages.length === 0 && (
             <div className="mt-10 text-center text-sm text-muted-foreground">
               <Sparkles className="mx-auto mb-3 h-8 w-8 opacity-50" />
