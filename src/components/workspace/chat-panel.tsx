@@ -51,7 +51,9 @@ export function ChatPanel({
   projectName,
   template,
   model,
+  onModelChange,
   mode,
+  onModeChange,
   runtime,
   initialMessages,
   initialPrompt,
@@ -60,6 +62,7 @@ export function ChatPanel({
   onExitPlan,
   onCommandOutput,
   onTurnSettled,
+  headerActions,
 }: ChatPanelProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
