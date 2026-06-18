@@ -40,6 +40,7 @@ export function PreviewPanel({
   previewUrl,
   supported,
   onStart,
+  headerActions,
 }: PreviewPanelProps) {
   const [tab, setTab] = useState<"preview" | "terminal">("preview");
   const [iframeKey, setIframeKey] = useState(0);
