@@ -19,7 +19,9 @@ interface WorkspacePanelProps {
   status: WCStatus;
   previewUrl: string | null;
   supported: boolean;
+  embedded: boolean;
   onStart: () => void;
+  onRetryIsolation: () => void;
   selectedPath: string | null;
   onSelect: (path: string) => void;
   onCreateFile: (path: string) => void;
@@ -95,7 +97,9 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
       status={props.status}
       previewUrl={props.previewUrl}
       supported={props.supported}
+      embedded={props.embedded}
       onStart={props.onStart}
+      onRetryIsolation={props.onRetryIsolation}
       headerActions={menu}
     />
   );
