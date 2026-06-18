@@ -8,88 +8,43 @@
  * resources (images, fonts, auth provider) keep loading without CORP headers.
  *
  * Based on https://github.com/gzuidhof/coi-serviceworker (MIT).
+ * Registration is handled by the app (see registerCoiServiceWorker).
  */
 /* eslint-disable no-restricted-globals */
 
-if (typeof window === "undefined") {
-  self.addEventListener("install", () => self.skipWaiting());
-  self.addEventListener("activate", (event) =>
-    event.waitUntil(self.clients.claim()),
-  );
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
-  self.addEventListener("message", (ev) => {
-    if (!ev.data) return;
-    if (ev.data.type === "deregister") {
-      self.registration
-        .unregister()
-        .then(() => self.clients.matchAll())
-        .then((clients) => clients.forEach((client) => client.navigate(client.url)));
-    }
-  });
+self.addEventListener("message", (ev) => {
+  if (ev.data && ev.data.type === "deregister") {
+    self.registration
+      .unregister()
+      .then(() => self.clients.matchAll())
+      .then((clients) => clients.forEach((client) => client.navigate(client.url)));
+  }
+});
 
-  self.addEventListener("fetch", function (event) {
-    const r = event.request;
-    if (r.cache === "only-if-cached" && r.mode !== "same-origin") return;
+self.addEventListener("fetch", function (event) {
+  const r = event.request;
+  if (r.cache === "only-if-cached" && r.mode !== "same-origin") return;
 
-    const request =
-      r.mode === "no-cors"
-        ? new Request(r, { credentials: "omit" })
-        : r;
+  const request = r.mode === "no-cors" ? new Request(r, { credentials: "omit" }) : r;
 
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.status === 0) return response;
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        if (response.status === 0) return response;
 
-          const newHeaders = new Headers(response.headers);
-          newHeaders.set("Cross-Origin-Embedder-Policy", "credentialless");
-          newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+        const newHeaders = new Headers(response.headers);
+        newHeaders.set("Cross-Origin-Embedder-Policy", "credentialless");
+        newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
 
-          return new Response(response.body, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: newHeaders,
-          });
-        })
-        .catch((e) => console.error(e)),
-    );
-  });
-} else {
-  (() => {
-    const reloadedBySelf = window.sessionStorage.getItem("coiReloadedBySelf");
-    window.sessionStorage.removeItem("coiReloadedBySelf");
-
-    const coi = {
-      shouldRegister: () => !reloadedBySelf,
-      shouldDeregister: () => false,
-      doReload: () => window.location.reload(),
-      quiet: false,
-    };
-
-    const n = navigator;
-    if (n.serviceWorker && n.serviceWorker.controller) {
-      if (window.crossOriginIsolated === false && !coi.quiet) {
-        // Controlled but not isolated yet — a reload will pick up the headers.
-      }
-    }
-
-    if (!window.crossOriginIsolated && coi.shouldRegister() && n.serviceWorker) {
-      n.serviceWorker
-        .register(window.document.currentScript.src)
-        .then((registration) => {
-          registration.addEventListener("updatefound", () => {
-            window.sessionStorage.setItem("coiReloadedBySelf", "true");
-            coi.doReload();
-          });
-
-          if (registration.active && !n.serviceWorker.controller) {
-            window.sessionStorage.setItem("coiReloadedBySelf", "true");
-            coi.doReload();
-          }
-        })
-        .catch((err) => {
-          if (!coi.quiet) console.error("COOP/COEP Service Worker failed to register:", err);
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: newHeaders,
         });
-    }
-  })();
-}
+      })
+      .catch((e) => console.error(e)),
+  );
+});
