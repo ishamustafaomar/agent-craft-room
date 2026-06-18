@@ -2,7 +2,7 @@
 // summarized into a single structured synthetic message so detail is preserved
 // instead of dropped. Adapted from Dyad's COMPACTION_SYSTEM_PROMPT.
 import { generateText, type UIMessage } from "ai";
-import { DEFAULT_MODEL } from "./models";
+import { RESOLVED_DEFAULT_MODEL } from "./models";
 
 export const COMPACTION_SYSTEM_PROMPT = `You are summarizing a coding conversation to preserve the most important context while staying concise.
 
@@ -67,7 +67,7 @@ export async function compactHistory(
   let summaryText: string;
   try {
     const { text } = await generateText({
-      model: gateway(DEFAULT_MODEL),
+      model: gateway(RESOLVED_DEFAULT_MODEL),
       system: COMPACTION_SYSTEM_PROMPT,
       prompt: `Summarize the earlier part of this coding conversation:\n\n${transcript}`,
     });

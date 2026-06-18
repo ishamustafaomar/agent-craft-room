@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
   DefaultChatTransport,
@@ -12,6 +12,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MODEL_GROUPS } from "@/lib/agent/models";
 import { ToolActivity } from "./tool-activity";
 import { MarkdownMessage } from "./markdown-message";
 import { Sparkles, ArrowUp, Loader2, Square } from "lucide-react";
@@ -22,7 +32,9 @@ interface ChatPanelProps {
   projectName: string;
   template: string;
   model: string;
+  onModelChange: (model: string) => void;
   mode: "build" | "ask" | "plan";
+  onModeChange: (mode: "build" | "ask" | "plan") => void;
   runtime: Runtime;
   initialMessages: UIMessage[];
   initialPrompt?: string;
@@ -31,6 +43,7 @@ interface ChatPanelProps {
   onExitPlan?: () => void;
   onCommandOutput?: (chunk: string) => void;
   onTurnSettled?: () => void;
+  headerActions?: ReactNode;
 }
 
 export function ChatPanel({
@@ -38,7 +51,9 @@ export function ChatPanel({
   projectName,
   template,
   model,
+  onModelChange,
   mode,
+  onModeChange,
   runtime,
   initialMessages,
   initialPrompt,
@@ -47,6 +62,7 @@ export function ChatPanel({
   onExitPlan,
   onCommandOutput,
   onTurnSettled,
+  headerActions,
 }: ChatPanelProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -179,9 +195,14 @@ export function ChatPanel({
 
   return (
     <div className="flex h-full flex-col bg-card">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <span className="text-sm font-medium">AI Agent</span>
+      <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
+        <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+        <span className="truncate text-sm font-medium">AI Agent</span>
+        {headerActions && (
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">
+            {headerActions}
+          </div>
+        )}
       </div>
 
       <ScrollArea className="min-w-0 flex-1">
@@ -215,7 +236,7 @@ export function ChatPanel({
       </ScrollArea>
 
       <div className="border-t border-border p-3">
-        <div className="relative flex items-end gap-2 rounded-xl border border-input bg-background p-2">
+        <div className="flex flex-col gap-2 rounded-xl border border-input bg-background p-2">
           <Textarea
             ref={textareaRef}
             value={input}
@@ -229,27 +250,57 @@ export function ChatPanel({
             placeholder="Ask the agent to build or change something…"
             className="max-h-40 min-h-[44px] resize-none border-0 bg-transparent p-1.5 shadow-none focus-visible:ring-0"
           />
-          {isBusy ? (
-            <Button
-              size="icon"
-              variant="secondary"
-              onClick={() => stop()}
-              aria-label="Stop generating"
-              className="shrink-0"
-            >
-              <Square className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              size="icon"
-              onClick={handleSend}
-              disabled={!input.trim()}
-              aria-label="Send message"
-              className="shrink-0"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={mode} onValueChange={(v) => onModeChange(v as "build" | "plan")}>
+              <SelectTrigger className="h-8 w-[100px] text-xs">
+                <SelectValue placeholder="Mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="build" className="text-xs">Build</SelectItem>
+                <SelectItem value="plan" className="text-xs">Plan</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={model} onValueChange={onModelChange}>
+              <SelectTrigger className="h-8 w-[150px] text-xs">
+                <SelectValue placeholder="Model" />
+              </SelectTrigger>
+              <SelectContent>
+                {MODEL_GROUPS.map((group) => (
+                  <SelectGroup key={group.provider}>
+                    <SelectLabel>{group.provider}</SelectLabel>
+                    {group.models.map((m) => (
+                      <SelectItem key={m.id} value={m.id} className="text-xs">
+                        {m.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="ml-auto">
+              {isBusy ? (
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  onClick={() => stop()}
+                  aria-label="Stop generating"
+                  className="h-8 w-8 shrink-0"
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  size="icon"
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  aria-label="Send message"
+                  className="h-8 w-8 shrink-0"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

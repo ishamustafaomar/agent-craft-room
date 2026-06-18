@@ -21,6 +21,7 @@ interface PreviewPanelProps {
   previewUrl: string | null;
   supported: boolean;
   onStart: () => void;
+  headerActions?: React.ReactNode;
 }
 
 const STATUS_LABEL: Record<WCStatus, string> = {
@@ -39,6 +40,7 @@ export function PreviewPanel({
   previewUrl,
   supported,
   onStart,
+  headerActions,
 }: PreviewPanelProps) {
   const [tab, setTab] = useState<"preview" | "terminal">("preview");
   const [iframeKey, setIframeKey] = useState(0);
@@ -104,6 +106,7 @@ export function PreviewPanel({
               Restart
             </Button>
           )}
+          {headerActions}
         </div>
       </div>
 
