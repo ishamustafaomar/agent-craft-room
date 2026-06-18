@@ -19,25 +19,31 @@ export async function registerCoiServiceWorker(): Promise<boolean> {
   // Avoid a reload loop: only reload once per session attempt.
   const RELOAD_KEY = "coiReloadedBySelf";
 
+  const reloadOnce = () => {
+    if (window.sessionStorage.getItem(RELOAD_KEY)) return false;
+    window.sessionStorage.setItem(RELOAD_KEY, "true");
+    window.location.reload();
+    return true;
+  };
+
   try {
     const registration = await navigator.serviceWorker.register("/coi-serviceworker.js", {
       scope: "/",
     });
 
-    // If a worker is active but not yet controlling this page, reload once so
-    // its rewritten headers apply and isolation turns on.
-    if (registration.active && !navigator.serviceWorker.controller) {
-      if (!window.sessionStorage.getItem(RELOAD_KEY)) {
-        window.sessionStorage.setItem(RELOAD_KEY, "true");
-        window.location.reload();
-      }
+    await navigator.serviceWorker.ready;
+
+    // The current document was loaded before the service worker could add
+    // COOP/COEP headers, so reload once after the worker is ready. This covers
+    // both first install and clients.claim() cases where a controller exists but
+    // the document response itself is still not cross-origin isolated.
+    if (!window.crossOriginIsolated) {
+      reloadOnce();
+      return false;
     }
 
     registration.addEventListener("updatefound", () => {
-      if (!window.sessionStorage.getItem(RELOAD_KEY)) {
-        window.sessionStorage.setItem(RELOAD_KEY, "true");
-        window.location.reload();
-      }
+      reloadOnce();
     });
   } catch (err) {
     console.error("COOP/COEP service worker failed to register:", err);
