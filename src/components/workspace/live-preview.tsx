@@ -37,12 +37,20 @@ export function LivePreview({ files, autoStart = true }: { files: FileMap; autoS
 
   useEffect(() => {
     let cancelled = false;
-    import("@/lib/execution/webcontainer-manager").then((m) => {
+    (async () => {
+      // Ensure the page is cross-origin isolated (may reload once on first run).
+      const { registerCoiServiceWorker } = await import(
+        "@/lib/execution/coi-service-worker"
+      );
+      await registerCoiServiceWorker();
+      if (cancelled) return;
+
+      const m = await import("@/lib/execution/webcontainer-manager");
       if (cancelled) return;
       const ok = m.WebContainerManager.isSupported();
       setSupported(ok);
       if (ok && autoStart) void start();
-    });
+    })();
     return () => {
       cancelled = true;
     };
