@@ -21,6 +21,7 @@ interface PreviewPanelProps {
   previewUrl: string | null;
   supported: boolean;
   onStart: () => void;
+  headerActions?: React.ReactNode;
 }
 
 const STATUS_LABEL: Record<WCStatus, string> = {
