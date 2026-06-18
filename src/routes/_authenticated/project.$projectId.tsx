@@ -208,11 +208,17 @@ function WorkspaceInner({
   // globals and must never run during SSR).
   useEffect(() => {
     let cancelled = false;
-    import("@/lib/execution/webcontainer-manager").then((m) => {
+    (async () => {
+      const { registerCoiServiceWorker } = await import(
+        "@/lib/execution/coi-service-worker"
+      );
+      await registerCoiServiceWorker();
+      if (cancelled) return;
+      const m = await import("@/lib/execution/webcontainer-manager");
       if (cancelled) return;
       managerRef.current = m.getWebContainerManager();
       setSupported(m.WebContainerManager.isSupported());
-    });
+    })();
     return () => {
       cancelled = true;
     };
