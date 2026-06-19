@@ -1,0 +1,187 @@
+// Builds a self-contained HTML document that renders a generated React/Vite
+// project entirely client-side, with no server, no WebContainer, and no
+// cross-origin isolation. It is used as a graceful fallback for the live
+// preview when the page cannot be cross-origin isolated (e.g. inside the
+// embedded editor preview pane or a shared link opened in a non-isolated tab).
+//
+// How it works: the returned HTML embeds the project's source files as JSON and
+// a small loader that transpiles each module with Babel standalone (loaded from
+// a CDN), rewrites relative imports to blob URLs and bare imports to esm.sh, and
+// dynamically imports the entry module. React/ReactDOM are pinned to a single
+// version so hooks work across packages.
+//
+// Limitations: this is a lightweight renderer, not a full build. Tooling that
+// requires a build step (e.g. Tailwind's PostCSS pipeline, env injection,
+// non-ESM deps) won't be fully applied. For the full fidelity sandbox, the user
+// opens the workspace in a cross-origin-isolated top-level tab.
+
+import type { FileMap } from "./types";
+
+const ENTRY_CANDIDATES = [
+  "src/main.tsx",
+  "src/main.jsx",
+  "src/main.ts",
+  "src/main.js",
+  "src/index.tsx",
+  "src/index.jsx",
+  "main.tsx",
+  "main.jsx",
+  "index.tsx",
+  "index.jsx",
+];
+
+function findEntry(files: FileMap): string | null {
+  const htmlKey =
+    Object.keys(files).find((k) => k === "index.html") ??
+    Object.keys(files).find((k) => k.endsWith("/index.html")) ??
+    Object.keys(files).find((k) => k.toLowerCase().endsWith(".html"));
+
+  if (htmlKey) {
+    const m = files[htmlKey].match(/<script[^>]+src=["']([^"']+)["']/i);
+    if (m) {
+      const ref = m[1].replace(/^\.?\//, "");
+      if (files[ref] != null) return "/" + ref;
+    }
+  }
+
+  const cand = ENTRY_CANDIDATES.find((p) => files[p] != null);
+  return cand ? "/" + cand : null;
+}
+
+/**
+ * Returns a full HTML document string suitable for an iframe `srcDoc`, or null
+ * if the project has no recognizable client entry point to render statically.
+ */
+export function buildStaticPreviewDoc(files: FileMap): string | null {
+  const entry = findEntry(files);
+  if (!entry) return null;
+
+  // Normalize all keys to a single leading slash so module resolution is
+  // consistent regardless of how the source referenced them.
+  const slashFiles: Record<string, string> = {};
+  for (const [k, v] of Object.entries(files)) {
+    slashFiles["/" + k.replace(/^\/+/, "")] = v;
+  }
+  if (slashFiles[entry] == null) return null;
+
+  const css = Object.keys(slashFiles)
+    .filter((k) => k.endsWith(".css"))
+    .map((k) => slashFiles[k])
+    .join("\n");
+
+  const filesJson = JSON.stringify(slashFiles)
+    .replace(/<\/script>/gi, "<\\/script>")
+    .replace(/<!--/g, "<\\!--");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+html,body{margin:0;background:#fff;}
+#__static_err{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;padding:16px;color:#b91c1c;}
+${css}
+</style>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<div id="__static_err" hidden></div>
+<script>
+window.__FILES__ = ${filesJson};
+window.__ENTRY__ = ${JSON.stringify(entry)};
+</script>
+<script>
+(function(){
+  var FILES = window.__FILES__, ENTRY = window.__ENTRY__;
+  var REACT = "https://esm.sh/react@18.3.1";
+  var RDOM = "https://esm.sh/react-dom@18.3.1";
+  var cache = {};
+  var building = {};
+
+  function showError(msg){
+    var el = document.getElementById("__static_err");
+    el.hidden = false;
+    el.textContent = String(msg);
+  }
+  function dirname(p){ return p.slice(0, p.lastIndexOf("/")); }
+  function normalize(p){
+    var parts = p.split("/"), out = [];
+    for (var i=0;i<parts.length;i++){
+      var s = parts[i];
+      if (s === "" || s === ".") continue;
+      if (s === "..") out.pop(); else out.push(s);
+    }
+    return "/" + out.join("/");
+  }
+  function resolveLocal(base, spec){
+    var p = normalize(dirname(base) + "/" + spec);
+    var cands = [p, p+".tsx", p+".ts", p+".jsx", p+".js", p+".mjs",
+                 p+"/index.tsx", p+"/index.ts", p+"/index.jsx", p+"/index.js"];
+    for (var i=0;i<cands.length;i++) if (FILES[cands[i]] != null) return cands[i];
+    return null;
+  }
+  function mapBare(spec){
+    if (spec === "react") return REACT;
+    if (spec === "react/jsx-runtime") return REACT + "/jsx-runtime";
+    if (spec === "react/jsx-dev-runtime") return REACT + "/jsx-dev-runtime";
+    if (spec === "react-dom") return RDOM;
+    if (spec.indexOf("react-dom/") === 0) return RDOM + spec.slice("react-dom".length);
+    return "https://esm.sh/" + spec + "?external=react,react-dom";
+  }
+  var EMPTY = "data:text/javascript,export default {};";
+  var importRe = /(import\\s+(?:[^'"]*?\\sfrom\\s+)?|export\\s+[^'"]*?\\sfrom\\s+|import\\s*\\()\\s*(['"])([^'"]+)\\2/g;
+
+  function build(path){
+    if (cache[path]) return cache[path];
+    if (building[path]) return EMPTY; // cyclic import guard
+    building[path] = true;
+    var src = FILES[path] || "";
+    var code;
+    try {
+      code = Babel.transform(src, {
+        filename: path,
+        presets: [
+          ["react", { runtime: "automatic" }],
+          ["typescript", { allExtensions: true, isTSX: true, onlyRemoveTypeImports: true }],
+        ],
+      }).code;
+    } catch (e) {
+      throw new Error("Failed to compile " + path + ":\\n" + (e && e.message ? e.message : e));
+    }
+    code = code.replace(importRe, function(m, pre, q, spec){
+      if (/\\.(css|scss|sass|less|svg|png|jpg|jpeg|gif|webp)$/i.test(spec)) return pre + q + EMPTY + q;
+      if (spec[0] === ".") {
+        var rp = resolveLocal(path, spec);
+        if (!rp) return m;
+        return pre + q + build(rp) + q;
+      }
+      return pre + q + mapBare(spec) + q;
+    });
+    var url = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
+    cache[path] = url;
+    return url;
+  }
+
+  function run(){
+    try {
+      var entryUrl = build(ENTRY);
+      import(entryUrl).catch(function(e){ showError(e && e.stack ? e.stack : e); });
+    } catch (e) {
+      showError(e && e.stack ? e.stack : e);
+    }
+  }
+
+  if (window.Babel) run();
+  else {
+    var t = setInterval(function(){
+      if (window.Babel){ clearInterval(t); run(); }
+    }, 30);
+    setTimeout(function(){ clearInterval(t); if (!window.Babel) showError("Could not load the preview compiler."); }, 8000);
+  }
+})();
+</script>
+</body>
+</html>`;
+}
