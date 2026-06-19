@@ -325,20 +325,33 @@ function Dashboard() {
 
         {/* Footer cards */}
         <div className="space-y-2 p-3">
-          <div className="flex items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5">
+          <button
+            type="button"
+            onClick={copyInvite}
+            className="flex w-full items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5 text-left transition-colors hover:bg-white/80"
+          >
             <Gift className="h-4 w-4 shrink-0 text-[oklch(0.55_0.12_300)]" />
             <div className="min-w-0">
               <p className="text-sm font-medium leading-tight">Share Breezy</p>
               <p className="truncate text-xs text-[oklch(0.5_0.03_280)]">Invite a friend</p>
             </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5">
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              toast.message("You're on the free plan", {
+                description: "Paid plans with more features are coming soon.",
+              })
+            }
+            className="flex w-full items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5 text-left transition-colors hover:bg-white/80"
+          >
             <Zap className="h-4 w-4 shrink-0 text-[oklch(0.7_0.15_60)]" />
             <div className="min-w-0">
               <p className="text-sm font-medium leading-tight">Upgrade</p>
               <p className="truncate text-xs text-[oklch(0.5_0.03_280)]">Unlock more features</p>
             </div>
-          </div>
+          </button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left transition-colors hover:bg-white/50">
