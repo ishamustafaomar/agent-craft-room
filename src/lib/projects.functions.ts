@@ -53,8 +53,9 @@ export const getProject = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data: project, error } = await supabase
       .from("projects")
-      .select("id, name, template, chat_summary, is_public, published_at, created_at, updated_at")
+      .select("id, name, template, chat_summary, description, slug, is_public, published_at, created_at, updated_at")
       .eq("id", data.projectId)
+
       .single();
     if (error || !project) throw new Error(error?.message ?? "Project not found");
 
@@ -296,6 +297,95 @@ export const getPublicProject = createServerFn({ method: "GET" })
 
     return { project: { id: project.id, name: project.name }, files: files ?? [] };
   });
+
+// Turn an app name into a URL-safe slug used for the published address.
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
+// Publish a project: store name/description, mark public, and assign a unique
+// slug used to build the {slug}.breezyai.dev / /app/{slug} address.
+export const publishProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      projectId: z.string().uuid(),
+      name: z.string().trim().min(1).max(120),
+      description: z.string().trim().max(300).optional().default(""),
+      slug: z.string().trim().max(60).optional(),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const base = slugify(data.slug || data.name) || "app";
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Find a slug that is not already taken by a different project.
+    let slug = base;
+    for (let n = 2; n < 1000; n++) {
+      const { data: existing } = await supabaseAdmin
+        .from("projects")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (!existing || existing.id === data.projectId) break;
+      slug = `${base}-${n}`;
+    }
+
+    const { error } = await supabase
+      .from("projects")
+      .update({
+        name: data.name,
+        description: data.description ?? "",
+        slug,
+        is_public: true,
+        published_at: new Date().toISOString(),
+      })
+      .eq("id", data.projectId);
+    if (error) throw new Error(error.message);
+    return { ok: true, slug };
+  });
+
+// Public read for the published /app/:slug route. Returns data only when the
+// project is public. Uses the admin client because public routes run during SSR
+// with no bearer token.
+export const getPublishedApp = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ slug: z.string().trim().min(1).max(60) }))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: project, error } = await supabaseAdmin
+      .from("projects")
+      .select("id, name, description, is_public")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!project || !project.is_public) {
+      return {
+        project: null,
+        files: [] as { path: string; content: string }[],
+      };
+    }
+
+    const { data: files, error: filesError } = await supabaseAdmin
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", project.id)
+      .order("path", { ascending: true });
+    if (filesError) throw new Error(filesError.message);
+
+    return {
+      project: { id: project.id, name: project.name, description: project.description },
+      files: files ?? [],
+    };
+  });
+
 
 // ---------- Version history (snapshots) ----------
 

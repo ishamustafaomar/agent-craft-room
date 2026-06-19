@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShareDialog } from "@/components/workspace/share-dialog";
+import { PublishDialog } from "@/components/workspace/publish-dialog";
+
 import { VersionHistory } from "@/components/workspace/version-history";
 import { GithubExport } from "@/components/workspace/github-export";
 import { PresenceBar } from "@/components/workspace/presence-bar";
@@ -100,6 +102,8 @@ function Workspace() {
       projectName={data.project.name}
       template={data.project.template}
       initialPublic={data.project.is_public ?? false}
+      initialDescription={data.project.description ?? ""}
+      initialSlug={data.project.slug ?? null}
       initialFiles={Object.fromEntries(data.files.map((f) => [f.path, f.content]))}
       initialMessages={initialMessages}
       // Only auto-run the prompt for a brand-new project with no history yet.
@@ -113,6 +117,8 @@ function WorkspaceInner({
   projectName,
   template,
   initialPublic,
+  initialDescription,
+  initialSlug,
   initialFiles,
   initialMessages,
   initialPrompt,
@@ -121,10 +127,13 @@ function WorkspaceInner({
   projectName: string;
   template: string;
   initialPublic: boolean;
+  initialDescription: string;
+  initialSlug: string | null;
   initialFiles: FileMap;
   initialMessages: UIMessage[];
   initialPrompt?: string;
 }) {
+
   const [files, setFiles] = useState<FileMap>(initialFiles);
   const [selectedPath, setSelectedPath] = useState<string | null>(
     Object.keys(initialFiles).sort()[0] ?? null,
@@ -371,11 +380,13 @@ function WorkspaceInner({
             />
           </div>
           <ShareDialog projectId={projectId} initialPublic={initialPublic} />
-          <a href={`/p/${projectId}`} target="_blank" rel="noreferrer">
-            <Button size="sm" className="h-8">
-              Publish
-            </Button>
-          </a>
+          <PublishDialog
+            projectId={projectId}
+            projectName={projectName}
+            initialDescription={initialDescription}
+            initialSlug={initialSlug}
+          />
+
         </div>
       </header>
 

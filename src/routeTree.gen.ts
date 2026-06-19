@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
 import { Route as BlogHowToBuildWebAppWithAiRouteImport } from './routes/blog.how-to-build-web-app-with-ai'
+import { Route as AppSlugRouteImport } from './routes/app.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiGithubPushRouteImport } from './routes/api/github/push'
@@ -50,6 +51,11 @@ const BlogHowToBuildWebAppWithAiRoute =
     path: '/blog/how-to-build-web-app-with-ai',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AppSlugRoute = AppSlugRouteImport.update({
+  id: '/app/$slug',
+  path: '/app/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/chat': typeof ApiChatRoute
+  '/app/$slug': typeof AppSlugRoute
   '/blog/how-to-build-web-app-with-ai': typeof BlogHowToBuildWebAppWithAiRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/chat': typeof ApiChatRoute
+  '/app/$slug': typeof AppSlugRoute
   '/blog/how-to-build-web-app-with-ai': typeof BlogHowToBuildWebAppWithAiRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/api/chat': typeof ApiChatRoute
+  '/app/$slug': typeof AppSlugRoute
   '/blog/how-to-build-web-app-with-ai': typeof BlogHowToBuildWebAppWithAiRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/api/chat'
+    | '/app/$slug'
     | '/blog/how-to-build-web-app-with-ai'
     | '/p/$projectId'
     | '/project/$projectId'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/api/chat'
+    | '/app/$slug'
     | '/blog/how-to-build-web-app-with-ai'
     | '/p/$projectId'
     | '/project/$projectId'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/dashboard'
     | '/api/chat'
+    | '/app/$slug'
     | '/blog/how-to-build-web-app-with-ai'
     | '/p/$projectId'
     | '/_authenticated/project/$projectId'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
+  AppSlugRoute: typeof AppSlugRoute
   BlogHowToBuildWebAppWithAiRoute: typeof BlogHowToBuildWebAppWithAiRoute
   PProjectIdRoute: typeof PProjectIdRoute
   ApiGithubPushRoute: typeof ApiGithubPushRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/how-to-build-web-app-with-ai'
       fullPath: '/blog/how-to-build-web-app-with-ai'
       preLoaderRoute: typeof BlogHowToBuildWebAppWithAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/$slug': {
+      id: '/app/$slug'
+      path: '/app/$slug'
+      fullPath: '/app/$slug'
+      preLoaderRoute: typeof AppSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -249,6 +269,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
+  AppSlugRoute: AppSlugRoute,
   BlogHowToBuildWebAppWithAiRoute: BlogHowToBuildWebAppWithAiRoute,
   PProjectIdRoute: PProjectIdRoute,
   ApiGithubPushRoute: ApiGithubPushRoute,
