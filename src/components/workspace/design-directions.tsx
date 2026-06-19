@@ -34,7 +34,13 @@ const LAYOUTS = [
  * Lightweight design-direction picker. Collects a palette, vibe, and layout and
  * hands back a concise creative brief that gets prepended to the build prompt.
  */
-export function DesignDirections({ onApply }: { onApply: (brief: string) => void }) {
+export function DesignDirections({
+  onApply,
+  trigger,
+}: {
+  onApply: (brief: string) => void;
+  trigger?: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const [palette, setPalette] = useState(PALETTES[0]);
   const [vibe, setVibe] = useState(VIBES[0]);
@@ -49,12 +55,14 @@ export function DesignDirections({ onApply }: { onApply: (brief: string) => void
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="flex items-center gap-1 rounded-full border border-dashed border-primary/50 px-3 py-1 text-xs text-primary transition-colors hover:bg-primary/10"
-        >
-          <Wand2 className="h-3 w-3" /> Design it for me
-        </button>
+        {trigger ?? (
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded-full border border-dashed border-primary/50 px-3 py-1 text-xs text-primary transition-colors hover:bg-primary/10"
+          >
+            <Wand2 className="h-3 w-3" /> Design it for me
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
