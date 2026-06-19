@@ -83,6 +83,14 @@ html,body{margin:0;background:#fff;}
 #__static_err{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;padding:16px;color:#b91c1c;}
 ${css}
 </style>
+<script type="importmap">
+{"imports":{
+"react":"https://esm.sh/react@18.3.1",
+"react/":"https://esm.sh/react@18.3.1/",
+"react-dom":"https://esm.sh/react-dom@18.3.1",
+"react-dom/":"https://esm.sh/react-dom@18.3.1/"
+}}
+</script>
 <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
 </head>
 <body>
