@@ -144,10 +144,12 @@ export type Database = {
         Row: {
           chat_summary: string | null
           created_at: string
+          description: string | null
           id: string
           is_public: boolean
           name: string
           published_at: string | null
+          slug: string | null
           template: string
           updated_at: string
           user_id: string
@@ -155,10 +157,12 @@ export type Database = {
         Insert: {
           chat_summary?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           is_public?: boolean
           name?: string
           published_at?: string | null
+          slug?: string | null
           template?: string
           updated_at?: string
           user_id: string
@@ -166,10 +170,12 @@ export type Database = {
         Update: {
           chat_summary?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           is_public?: boolean
           name?: string
           published_at?: string | null
+          slug?: string | null
           template?: string
           updated_at?: string
           user_id?: string
