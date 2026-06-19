@@ -378,11 +378,13 @@ function WorkspaceInner({
             />
           </div>
           <ShareDialog projectId={projectId} initialPublic={initialPublic} />
-          <a href={`/p/${projectId}`} target="_blank" rel="noreferrer">
-            <Button size="sm" className="h-8">
-              Publish
-            </Button>
-          </a>
+          <PublishDialog
+            projectId={projectId}
+            projectName={projectName}
+            initialDescription={initialDescription}
+            initialSlug={initialSlug}
+          />
+
         </div>
       </header>
 
