@@ -97,8 +97,22 @@ function Dashboard() {
   const [planMode, setPlanMode] = useState<"Build" | "Plan">("Build");
   const [activeTab, setActiveTab] = useState<ProjectTab>("My projects");
   const [search, setSearch] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
+
+  function copyInvite() {
+    const url = "https://breezyai.dev/";
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => toast.success("Invite link copied — share Breezy with a friend!"))
+        .catch(() => toast.message("Share Breezy", { description: url }));
+    } else {
+      toast.message("Share Breezy", { description: url });
+    }
+  }
+
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
