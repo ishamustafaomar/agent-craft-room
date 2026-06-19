@@ -293,9 +293,10 @@ function Dashboard() {
             <button type="button" onClick={() => setActiveTab("Starred")} className={navMuted}>
               <Star className="h-4 w-4" /> Starred
             </button>
-            <span className={navMuted}>
+            <button type="button" onClick={() => setActiveTab("My projects")} className={navMuted}>
               <UserIcon className="h-4 w-4" /> Created by me
-            </span>
+            </button>
+
             <button type="button" onClick={() => setActiveTab("Shared with me")} className={navMuted}>
               <Users className="h-4 w-4" /> Shared with me
             </button>
