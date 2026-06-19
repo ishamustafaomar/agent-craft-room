@@ -198,19 +198,23 @@ function Dashboard() {
   return (
     <div className="flex h-screen overflow-hidden bg-breezy-mesh text-[oklch(0.22_0.03_280)]">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-white/50 bg-white/45 backdrop-blur-xl md:flex">
+      <aside
+        className={`${sidebarOpen ? "md:flex" : "md:hidden"} hidden w-64 shrink-0 flex-col border-r border-white/50 bg-white/45 backdrop-blur-xl`}
+      >
         <div className="flex items-center justify-between px-4 py-4">
           <Link to="/dashboard" className="flex items-center">
             <BrandLogo size={24} />
           </Link>
           <button
             type="button"
+            onClick={() => setSidebarOpen(false)}
             className="rounded-md p-1.5 text-[oklch(0.45_0.03_280)] transition-colors hover:bg-white/60"
-            aria-label="Toggle sidebar"
+            aria-label="Collapse sidebar"
           >
             <PanelLeft className="h-4 w-4" />
           </button>
         </div>
+
 
         {/* Workspace switcher */}
         <div className="px-3">
