@@ -267,9 +267,18 @@ function Dashboard() {
           <Link to="/blog/how-to-build-web-app-with-ai" className={navMuted}>
             <Compass className="h-4 w-4" /> Resources
           </Link>
-          <span className={navMuted}>
+          <button
+            type="button"
+            onClick={() =>
+              toast.message("Connectors", {
+                description: "Connect your tools — coming soon to Breezy.",
+              })
+            }
+            className={navMuted}
+          >
             <Plug className="h-4 w-4" /> Connectors
-          </span>
+          </button>
+
         </nav>
 
         {/* Projects nav */}
