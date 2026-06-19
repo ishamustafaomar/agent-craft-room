@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import type { FileMap } from "@/lib/execution/types";
 import type { WCStatus } from "@/lib/execution/webcontainer-manager";
+import { buildStaticPreviewDoc } from "@/lib/execution/static-preview";
 import {
   Monitor,
   TerminalSquare,
@@ -11,7 +12,7 @@ import {
   Loader2,
   RefreshCw,
   ExternalLink,
-  AlertTriangle,
+  Zap,
 } from "lucide-react";
 
 interface PreviewPanelProps {
@@ -53,6 +54,13 @@ export function PreviewPanel({
   const isWorking =
     status === "booting" || status === "installing" || status === "starting";
 
+  // When the live sandbox can't run (no cross-origin isolation), fall back to a
+  // client-only static render of the project so the pane still shows the app.
+  const staticDoc = useMemo(
+    () => (!supported ? buildStaticPreviewDoc(files) : null),
+    [supported, files],
+  );
+
   return (
     <div className="flex h-full flex-col bg-card">
       <div className="flex items-center gap-1 border-b border-border px-2 py-1.5">
@@ -70,13 +78,13 @@ export function PreviewPanel({
         />
 
         <div className="ml-auto flex items-center gap-2">
-          {status !== "idle" && (
+          {supported && status !== "idle" && (
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
               {isWorking && <Loader2 className="h-3 w-3 animate-spin" />}
               {STATUS_LABEL[status]}
             </span>
           )}
-          {previewUrl && (
+          {(previewUrl || (!supported && staticDoc)) && (
             <button
               onClick={() => setIframeKey((k) => k + 1)}
               title="Reload preview"
@@ -115,7 +123,7 @@ export function PreviewPanel({
       </div>
 
       {tab === "preview" ? (
-        <div className="relative flex-1">
+        <div className="relative flex flex-1 flex-col">
           {previewUrl ? (
             <iframe
               key={iframeKey}
@@ -124,36 +132,59 @@ export function PreviewPanel({
               className="h-full w-full border-0 bg-white"
               allow="cross-origin-isolated"
             />
+          ) : !supported && staticDoc ? (
+            <>
+              <div className="flex shrink-0 items-center gap-2 border-b border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground">
+                <Zap className="h-3.5 w-3.5 shrink-0 text-primary" />
+                <span className="min-w-0 flex-1 truncate">
+                  Static preview — open a full tab for the live sandbox.
+                </span>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-6 shrink-0 gap-1 px-2 text-xs"
+                  onClick={() =>
+                    window.open(window.location.href, "_blank", "noopener,noreferrer")
+                  }
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  Full tab
+                </Button>
+              </div>
+              <iframe
+                key={iframeKey}
+                srcDoc={staticDoc}
+                title="Static app preview"
+                sandbox="allow-scripts allow-popups allow-modals allow-forms allow-pointer-lock"
+                className="h-full w-full flex-1 border-0 bg-white"
+              />
+            </>
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
               {!supported ? (
                 <>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10">
-                    <AlertTriangle className="h-6 w-6 text-amber-500" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <Zap className="h-6 w-6 text-primary" />
                   </div>
-                  <p className="text-sm font-medium">
-                    Live preview needs cross-origin isolation
-                  </p>
-                  <p className="max-w-sm text-wrap text-xs leading-relaxed text-muted-foreground">
-                    {embedded
-                      ? "Open this workspace in a full browser tab to run the live preview."
-                      : "Breezy is preparing this tab for the in-browser sandbox."}{" "}
-                    The agent can still generate and edit all {fileCount} file
-                    {fileCount === 1 ? "" : "s"} here.
+                  <p className="text-sm font-medium">Live preview runs in a full tab</p>
+                  <p className="max-w-sm text-balance text-xs leading-relaxed text-muted-foreground">
+                    The in-browser sandbox needs a cross-origin-isolated tab, which the
+                    embedded preview can&apos;t provide. Open this workspace in a full
+                    browser tab to run it. The agent can still generate and edit all{" "}
+                    {fileCount} file{fileCount === 1 ? "" : "s"} here.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    {embedded && (
-                      <Button
-                        variant="secondary"
-                        onClick={() => window.open(window.location.href, "_blank", "noopener,noreferrer")}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Open full tab
-                      </Button>
-                    )}
-                    <Button variant={embedded ? "outline" : "secondary"} onClick={onRetryIsolation}>
+                    <Button
+                      onClick={() =>
+                        window.open(window.location.href, "_blank", "noopener,noreferrer")
+                      }
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open full tab
+                    </Button>
+                    <Button variant="outline" onClick={onRetryIsolation}>
                       <RefreshCw className="h-4 w-4" />
-                      Retry preview
+                      Retry
                     </Button>
                   </div>
                 </>

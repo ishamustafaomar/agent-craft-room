@@ -63,7 +63,9 @@ export function ShareDialog({
         <DialogHeader>
           <DialogTitle>Share this app</DialogTitle>
           <DialogDescription>
-            Make your app public to share a live, read-only link with anyone.
+            Make your app public to share a read-only link with anyone. The link
+            shows a live static preview; opening it in a full browser tab runs the
+            full in-browser sandbox.
           </DialogDescription>
         </DialogHeader>
 
