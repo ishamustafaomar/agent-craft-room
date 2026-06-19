@@ -379,13 +379,34 @@ function Dashboard() {
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+        {!sidebarOpen && (
+          <div className="hidden px-4 pt-4 md:block">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="rounded-md border border-white/60 bg-white/60 p-1.5 text-[oklch(0.45_0.03_280)] transition-colors hover:bg-white/80"
+              aria-label="Open sidebar"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         {/* Hero */}
         <section className="flex flex-col items-center px-6 pt-16 pb-8 text-center sm:pt-24">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-sm text-[oklch(0.4_0.03_280)] shadow-soft backdrop-blur">
+          <button
+            type="button"
+            onClick={() =>
+              toast.message("Connectors", {
+                description: "Connect your tools — coming soon to Breezy.",
+              })
+            }
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-sm text-[oklch(0.4_0.03_280)] shadow-soft backdrop-blur transition-colors hover:bg-white/80"
+          >
             <Sparkles className="h-4 w-4 text-[oklch(0.55_0.12_300)]" />
             Connect all your tools
             <ArrowRight className="h-3.5 w-3.5" />
-          </div>
+          </button>
+
 
           <h1 className="font-display text-4xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)] sm:text-5xl">
             What should we build, {firstName}?
