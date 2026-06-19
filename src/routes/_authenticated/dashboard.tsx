@@ -97,8 +97,22 @@ function Dashboard() {
   const [planMode, setPlanMode] = useState<"Build" | "Plan">("Build");
   const [activeTab, setActiveTab] = useState<ProjectTab>("My projects");
   const [search, setSearch] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
+
+  function copyInvite() {
+    const url = "https://breezyai.dev/";
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => toast.success("Invite link copied — share Breezy with a friend!"))
+        .catch(() => toast.message("Share Breezy", { description: url }));
+    } else {
+      toast.message("Share Breezy", { description: url });
+    }
+  }
+
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
@@ -184,19 +198,23 @@ function Dashboard() {
   return (
     <div className="flex h-screen overflow-hidden bg-breezy-mesh text-[oklch(0.22_0.03_280)]">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-white/50 bg-white/45 backdrop-blur-xl md:flex">
+      <aside
+        className={`${sidebarOpen ? "md:flex" : "md:hidden"} hidden w-64 shrink-0 flex-col border-r border-white/50 bg-white/45 backdrop-blur-xl`}
+      >
         <div className="flex items-center justify-between px-4 py-4">
           <Link to="/dashboard" className="flex items-center">
             <BrandLogo size={24} />
           </Link>
           <button
             type="button"
+            onClick={() => setSidebarOpen(false)}
             className="rounded-md p-1.5 text-[oklch(0.45_0.03_280)] transition-colors hover:bg-white/60"
-            aria-label="Toggle sidebar"
+            aria-label="Collapse sidebar"
           >
             <PanelLeft className="h-4 w-4" />
           </button>
         </div>
+
 
         {/* Workspace switcher */}
         <div className="px-3">
@@ -249,9 +267,18 @@ function Dashboard() {
           <Link to="/blog/how-to-build-web-app-with-ai" className={navMuted}>
             <Compass className="h-4 w-4" /> Resources
           </Link>
-          <span className={navMuted}>
+          <button
+            type="button"
+            onClick={() =>
+              toast.message("Connectors", {
+                description: "Connect your tools — coming soon to Breezy.",
+              })
+            }
+            className={navMuted}
+          >
             <Plug className="h-4 w-4" /> Connectors
-          </span>
+          </button>
+
         </nav>
 
         {/* Projects nav */}
@@ -266,9 +293,10 @@ function Dashboard() {
             <button type="button" onClick={() => setActiveTab("Starred")} className={navMuted}>
               <Star className="h-4 w-4" /> Starred
             </button>
-            <span className={navMuted}>
+            <button type="button" onClick={() => setActiveTab("My projects")} className={navMuted}>
               <UserIcon className="h-4 w-4" /> Created by me
-            </span>
+            </button>
+
             <button type="button" onClick={() => setActiveTab("Shared with me")} className={navMuted}>
               <Users className="h-4 w-4" /> Shared with me
             </button>
@@ -297,20 +325,33 @@ function Dashboard() {
 
         {/* Footer cards */}
         <div className="space-y-2 p-3">
-          <div className="flex items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5">
+          <button
+            type="button"
+            onClick={copyInvite}
+            className="flex w-full items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5 text-left transition-colors hover:bg-white/80"
+          >
             <Gift className="h-4 w-4 shrink-0 text-[oklch(0.55_0.12_300)]" />
             <div className="min-w-0">
               <p className="text-sm font-medium leading-tight">Share Breezy</p>
               <p className="truncate text-xs text-[oklch(0.5_0.03_280)]">Invite a friend</p>
             </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5">
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              toast.message("You're on the free plan", {
+                description: "Paid plans with more features are coming soon.",
+              })
+            }
+            className="flex w-full items-center gap-3 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5 text-left transition-colors hover:bg-white/80"
+          >
             <Zap className="h-4 w-4 shrink-0 text-[oklch(0.7_0.15_60)]" />
             <div className="min-w-0">
               <p className="text-sm font-medium leading-tight">Upgrade</p>
               <p className="truncate text-xs text-[oklch(0.5_0.03_280)]">Unlock more features</p>
             </div>
-          </div>
+          </button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left transition-colors hover:bg-white/50">
@@ -338,13 +379,34 @@ function Dashboard() {
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+        {!sidebarOpen && (
+          <div className="hidden px-4 pt-4 md:block">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="rounded-md border border-white/60 bg-white/60 p-1.5 text-[oklch(0.45_0.03_280)] transition-colors hover:bg-white/80"
+              aria-label="Open sidebar"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         {/* Hero */}
         <section className="flex flex-col items-center px-6 pt-16 pb-8 text-center sm:pt-24">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-sm text-[oklch(0.4_0.03_280)] shadow-soft backdrop-blur">
+          <button
+            type="button"
+            onClick={() =>
+              toast.message("Connectors", {
+                description: "Connect your tools — coming soon to Breezy.",
+              })
+            }
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-sm text-[oklch(0.4_0.03_280)] shadow-soft backdrop-blur transition-colors hover:bg-white/80"
+          >
             <Sparkles className="h-4 w-4 text-[oklch(0.55_0.12_300)]" />
             Connect all your tools
             <ArrowRight className="h-3.5 w-3.5" />
-          </div>
+          </button>
+
 
           <h1 className="font-display text-4xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)] sm:text-5xl">
             What should we build, {firstName}?
