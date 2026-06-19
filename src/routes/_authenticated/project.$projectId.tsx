@@ -100,6 +100,8 @@ function Workspace() {
       projectName={data.project.name}
       template={data.project.template}
       initialPublic={data.project.is_public ?? false}
+      initialDescription={data.project.description ?? ""}
+      initialSlug={data.project.slug ?? null}
       initialFiles={Object.fromEntries(data.files.map((f) => [f.path, f.content]))}
       initialMessages={initialMessages}
       // Only auto-run the prompt for a brand-new project with no history yet.
@@ -113,6 +115,8 @@ function WorkspaceInner({
   projectName,
   template,
   initialPublic,
+  initialDescription,
+  initialSlug,
   initialFiles,
   initialMessages,
   initialPrompt,
@@ -121,10 +125,13 @@ function WorkspaceInner({
   projectName: string;
   template: string;
   initialPublic: boolean;
+  initialDescription: string;
+  initialSlug: string | null;
   initialFiles: FileMap;
   initialMessages: UIMessage[];
   initialPrompt?: string;
 }) {
+
   const [files, setFiles] = useState<FileMap>(initialFiles);
   const [selectedPath, setSelectedPath] = useState<string | null>(
     Object.keys(initialFiles).sort()[0] ?? null,
