@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShareDialog } from "@/components/workspace/share-dialog";
+import { PublishDialog } from "@/components/workspace/publish-dialog";
+
 import { VersionHistory } from "@/components/workspace/version-history";
 import { GithubExport } from "@/components/workspace/github-export";
 import { PresenceBar } from "@/components/workspace/presence-bar";
