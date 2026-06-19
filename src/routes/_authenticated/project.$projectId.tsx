@@ -19,7 +19,14 @@ import { ChatPanel } from "@/components/workspace/chat-panel";
 import { WorkspacePanel } from "@/components/workspace/workspace-panel";
 import { DEFAULT_MODEL, isValidModel } from "@/lib/agent/models";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, ChevronDown, Globe, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShareDialog } from "@/components/workspace/share-dialog";
 import { VersionHistory } from "@/components/workspace/version-history";
@@ -300,22 +307,59 @@ function WorkspaceInner({
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card/60 px-3 backdrop-blur sm:px-4">
-        <Link
-          to="/dashboard"
-          className="flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          aria-label="Back to dashboard"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
-        <BrandLogo size={18} showWordmark={false} />
+      <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border bg-card/60 px-2 backdrop-blur sm:px-3">
+        {/* Left: brand + project name dropdown */}
         <div className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-sm font-medium">{projectName}</span>
-          <span className="hidden shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground sm:inline">
-            {template}
-          </span>
+          <Link
+            to="/dashboard"
+            className="flex shrink-0 items-center"
+            aria-label="Back to dashboard"
+          >
+            <BrandLogo size={18} showWordmark={false} />
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex min-w-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-muted">
+                <div className="min-w-0 leading-tight">
+                  <span className="block truncate text-sm font-medium">{projectName}</span>
+                  <span className="block truncate text-[10px] text-muted-foreground">
+                    Live preview
+                  </span>
+                </div>
+                <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-52">
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard">
+                  <ArrowLeft className="h-4 w-4" /> Back to dashboard
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled className="opacity-70">
+                Template: {template}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
+        {/* Center: page selector + open in new tab */}
+        <div className="mx-auto hidden items-center gap-1.5 sm:flex">
+          <span className="flex items-center gap-1.5 rounded-md border border-border bg-background/60 px-3 py-1 text-xs text-muted-foreground">
+            <Globe className="h-3.5 w-3.5" /> Homepage
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            disabled={!previewUrl}
+            onClick={() => previewUrl && window.open(previewUrl, "_blank", "noopener")}
+            aria-label="Open preview in new tab"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Right: presence, github, share, publish */}
         <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div className="hidden md:block">
             <PresenceBar projectId={projectId} />
@@ -327,8 +371,14 @@ function WorkspaceInner({
             />
           </div>
           <ShareDialog projectId={projectId} initialPublic={initialPublic} />
+          <a href={`/p/${projectId}`} target="_blank" rel="noreferrer">
+            <Button size="sm" className="h-8">
+              Publish
+            </Button>
+          </a>
         </div>
       </header>
+
 
 
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
