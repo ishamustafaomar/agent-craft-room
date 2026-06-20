@@ -363,14 +363,15 @@ function WorkspaceInner({
             <Globe className="h-3.5 w-3.5" /> Homepage
           </span>
           <Button
+            asChild
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
-            disabled={!previewUrl}
-            onClick={() => previewUrl && window.open(previewUrl, "_blank", "noopener")}
             aria-label="Open preview in new tab"
           >
-            <ExternalLink className="h-4 w-4" />
+            <a href={previewUrl || selfUrl || "#"} target="_blank" rel="noreferrer">
+              <ExternalLink className="h-4 w-4" />
+            </a>
           </Button>
         </div>
 
