@@ -182,13 +182,11 @@ export function PreviewPanel({
                     {fileCount} file{fileCount === 1 ? "" : "s"} here.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    <Button
-                      onClick={() =>
-                        window.open(window.location.href, "_blank", "noopener,noreferrer")
-                      }
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Open full tab
+                    <Button asChild>
+                      <a href={selfUrl || "#"} target="_blank" rel="noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                        Open full tab
+                      </a>
                     </Button>
                     <Button variant="outline" onClick={onRetryIsolation}>
                       <RefreshCw className="h-4 w-4" />
