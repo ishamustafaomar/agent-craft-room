@@ -104,7 +104,7 @@ export function buildStaticPreviewDoc(files: FileMap): string | null {
 ${tailwindTag}
 <style>
 html,body{margin:0;background:#fff;}
-#__static_err{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;padding:16px;color:#b91c1c;}
+#__static_err{position:fixed;top:0;left:0;right:0;z-index:2147483647;max-height:60vh;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;padding:16px;color:#b91c1c;background:#fff;border-bottom:1px solid #fca5a5;box-shadow:0 2px 8px rgba(0,0,0,.08);}
 ${css}
 </style>
 <script type="importmap">
