@@ -188,6 +188,36 @@ window.__ENTRY__ = ${JSON.stringify(entry)};
     return "https://esm.sh/" + spec + "?external=react,react-dom";
   }
   var EMPTY = "data:text/javascript,export default {};";
+  // Resolve an asset import (image/json) to an absolute project path.
+  function resolveAssetPath(base, spec){
+    if (spec[0] === ".") return normalize(dirname(base) + "/" + spec);
+    if ((spec[0] === "@" || spec[0] === "~") && spec[1] === "/") return normalize("/src/" + spec.slice(2));
+    if (spec[0] === "/") return spec;
+    return null;
+  }
+  // Turn a local asset file into an ES module. SVG/JSON are text so they can be
+  // inlined; raster images can't be bundled (no binary in the file map), so the
+  // agent should reference those by URL. This makes "import logo from './x.svg'"
+  // actually render instead of resolving to nothing.
+  function assetModule(p){
+    var key = "asset:" + p;
+    if (cache[key]) return cache[key];
+    var content = p ? FILES[p] : null;
+    var url;
+    if (content == null) {
+      url = EMPTY;
+    } else if (/\\.svg$/i.test(p)) {
+      var dataUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(content)));
+      url = URL.createObjectURL(new Blob(["export default " + JSON.stringify(dataUrl) + ";"], { type: "text/javascript" }));
+    } else if (/\\.json$/i.test(p)) {
+      url = URL.createObjectURL(new Blob(["export default " + content + ";"], { type: "text/javascript" }));
+    } else {
+      url = EMPTY;
+    }
+    cache[key] = url;
+    return url;
+  }
+
   var importRe = /(import\\s+(?:[^'"]*?\\sfrom\\s+)?|export\\s+[^'"]*?\\sfrom\\s+|import\\s*\\()\\s*(['"])([^'"]+)\\2/g;
 
   function build(path){
