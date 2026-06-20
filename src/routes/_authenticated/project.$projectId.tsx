@@ -144,6 +144,12 @@ function WorkspaceInner({
   const [supported, setSupported] = useState(false);
   const [embedded, setEmbedded] = useState(false);
   const [exporting, setExporting] = useState(false);
+  // Workspace's own top-level URL, used for "open in a real new tab" links that
+  // work even when window.open is blocked inside the embedded preview iframe.
+  const [selfUrl, setSelfUrl] = useState("");
+  useEffect(() => {
+    setSelfUrl(window.location.href);
+  }, []);
 
   // Per-project agent mode (build/plan), persisted in the browser.
   const modeStorageKey = `forge:mode:${projectId}`;
