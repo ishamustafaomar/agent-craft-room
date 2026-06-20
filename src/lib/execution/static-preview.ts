@@ -134,9 +134,27 @@ window.__ENTRY__ = ${JSON.stringify(entry)};
 
   function showError(msg){
     var el = document.getElementById("__static_err");
+    if (!el) return;
     el.hidden = false;
     el.textContent = String(msg);
   }
+  // Surface runtime errors (e.g. a crash when clicking a tab) instead of
+  // letting React unmount to a blank/black screen.
+  window.addEventListener("error", function(e){
+    showError((e.error && e.error.stack) || e.message || "Runtime error");
+  });
+  window.addEventListener("unhandledrejection", function(e){
+    var r = e.reason;
+    showError((r && r.stack) || (r && r.message) || String(r) || "Unhandled promise rejection");
+  });
+  // Client routers call history.pushState/replaceState; in an opaque-origin
+  // srcdoc iframe these can throw a SecurityError and crash the app. Make them
+  // no-throw so in-app navigation/tabs don't blank the preview.
+  try {
+    var _ps = history.pushState, _rs = history.replaceState;
+    history.pushState = function(){ try { return _ps.apply(history, arguments); } catch (e) { return undefined; } };
+    history.replaceState = function(){ try { return _rs.apply(history, arguments); } catch (e) { return undefined; } };
+  } catch (e) { /* ignore */ }
   function dirname(p){ return p.slice(0, p.lastIndexOf("/")); }
   function normalize(p){
     var parts = p.split("/"), out = [];
