@@ -25,7 +25,7 @@ export function MarkdownMessage({ content }: { content: string }) {
               );
             }
             return (
-              <code className="rounded bg-background/60 px-1 py-0.5 font-mono text-xs">
+              <code className="rounded bg-background/60 px-1 py-0.5 font-mono text-xs [overflow-wrap:anywhere]">
                 {children}
               </code>
             );
