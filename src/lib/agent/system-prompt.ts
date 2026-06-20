@@ -216,4 +216,10 @@ export const DEFAULT_AI_RULES = `# Tech Stack
 - Keep source code in the src folder. Put components in src/components and pages/screens in src/pages.
 - The entry/main screen lives in src/App.tsx; update it to render new components so the user can see them.
 - Use lucide-react for icons (already available).
-- Keep files small and focused.`;
+- Keep files small and focused.
+
+# Images & Preview
+- Use real images from remote URLs (e.g. https://images.unsplash.com or https://picsum.photos/seed/<word>/800/600) in <img> or CSS backgrounds. Do not import local raster files (.png/.jpg/.webp) — they don't render in the preview.
+- Use inline <svg> or imported .svg files for vector graphics and logos.
+- Prefer state-based tab/section switching; if you need real routing use HashRouter, never BrowserRouter or full-page navigation.
+- Wrap the app in a React error boundary so one component error never blanks the whole screen.`;
