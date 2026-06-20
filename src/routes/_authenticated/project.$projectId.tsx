@@ -144,6 +144,12 @@ function WorkspaceInner({
   const [supported, setSupported] = useState(false);
   const [embedded, setEmbedded] = useState(false);
   const [exporting, setExporting] = useState(false);
+  // Workspace's own top-level URL, used for "open in a real new tab" links that
+  // work even when window.open is blocked inside the embedded preview iframe.
+  const [selfUrl, setSelfUrl] = useState("");
+  useEffect(() => {
+    setSelfUrl(window.location.href);
+  }, []);
 
   // Per-project agent mode (build/plan), persisted in the browser.
   const modeStorageKey = `forge:mode:${projectId}`;
@@ -357,14 +363,15 @@ function WorkspaceInner({
             <Globe className="h-3.5 w-3.5" /> Homepage
           </span>
           <Button
+            asChild
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
-            disabled={!previewUrl}
-            onClick={() => previewUrl && window.open(previewUrl, "_blank", "noopener")}
             aria-label="Open preview in new tab"
           >
-            <ExternalLink className="h-4 w-4" />
+            <a href={previewUrl || selfUrl || "#"} target="_blank" rel="noreferrer">
+              <ExternalLink className="h-4 w-4" />
+            </a>
           </Button>
         </div>
 

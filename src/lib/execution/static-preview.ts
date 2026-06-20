@@ -104,7 +104,7 @@ export function buildStaticPreviewDoc(files: FileMap): string | null {
 ${tailwindTag}
 <style>
 html,body{margin:0;background:#fff;}
-#__static_err{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;padding:16px;color:#b91c1c;}
+#__static_err{position:fixed;top:0;left:0;right:0;z-index:2147483647;max-height:60vh;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;padding:16px;color:#b91c1c;background:#fff;border-bottom:1px solid #fca5a5;box-shadow:0 2px 8px rgba(0,0,0,.08);}
 ${css}
 </style>
 <script type="importmap">
@@ -134,9 +134,27 @@ window.__ENTRY__ = ${JSON.stringify(entry)};
 
   function showError(msg){
     var el = document.getElementById("__static_err");
+    if (!el) return;
     el.hidden = false;
     el.textContent = String(msg);
   }
+  // Surface runtime errors (e.g. a crash when clicking a tab) instead of
+  // letting React unmount to a blank/black screen.
+  window.addEventListener("error", function(e){
+    showError((e.error && e.error.stack) || e.message || "Runtime error");
+  });
+  window.addEventListener("unhandledrejection", function(e){
+    var r = e.reason;
+    showError((r && r.stack) || (r && r.message) || String(r) || "Unhandled promise rejection");
+  });
+  // Client routers call history.pushState/replaceState; in an opaque-origin
+  // srcdoc iframe these can throw a SecurityError and crash the app. Make them
+  // no-throw so in-app navigation/tabs don't blank the preview.
+  try {
+    var _ps = history.pushState, _rs = history.replaceState;
+    history.pushState = function(){ try { return _ps.apply(history, arguments); } catch (e) { return undefined; } };
+    history.replaceState = function(){ try { return _rs.apply(history, arguments); } catch (e) { return undefined; } };
+  } catch (e) { /* ignore */ }
   function dirname(p){ return p.slice(0, p.lastIndexOf("/")); }
   function normalize(p){
     var parts = p.split("/"), out = [];
@@ -170,6 +188,36 @@ window.__ENTRY__ = ${JSON.stringify(entry)};
     return "https://esm.sh/" + spec + "?external=react,react-dom";
   }
   var EMPTY = "data:text/javascript,export default {};";
+  // Resolve an asset import (image/json) to an absolute project path.
+  function resolveAssetPath(base, spec){
+    if (spec[0] === ".") return normalize(dirname(base) + "/" + spec);
+    if ((spec[0] === "@" || spec[0] === "~") && spec[1] === "/") return normalize("/src/" + spec.slice(2));
+    if (spec[0] === "/") return spec;
+    return null;
+  }
+  // Turn a local asset file into an ES module. SVG/JSON are text so they can be
+  // inlined; raster images can't be bundled (no binary in the file map), so the
+  // agent should reference those by URL. This makes "import logo from './x.svg'"
+  // actually render instead of resolving to nothing.
+  function assetModule(p){
+    var key = "asset:" + p;
+    if (cache[key]) return cache[key];
+    var content = p ? FILES[p] : null;
+    var url;
+    if (content == null) {
+      url = EMPTY;
+    } else if (/\\.svg$/i.test(p)) {
+      var dataUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(content)));
+      url = URL.createObjectURL(new Blob(["export default " + JSON.stringify(dataUrl) + ";"], { type: "text/javascript" }));
+    } else if (/\\.json$/i.test(p)) {
+      url = URL.createObjectURL(new Blob(["export default " + content + ";"], { type: "text/javascript" }));
+    } else {
+      url = EMPTY;
+    }
+    cache[key] = url;
+    return url;
+  }
+
   var importRe = /(import\\s+(?:[^'"]*?\\sfrom\\s+)?|export\\s+[^'"]*?\\sfrom\\s+|import\\s*\\()\\s*(['"])([^'"]+)\\2/g;
 
   function build(path){
@@ -190,7 +238,11 @@ window.__ENTRY__ = ${JSON.stringify(entry)};
       throw new Error("Failed to compile " + path + ":\\n" + (e && e.message ? e.message : e));
     }
     code = code.replace(importRe, function(m, pre, q, spec){
-      if (/\\.(css|scss|sass|less|svg|png|jpg|jpeg|gif|webp|avif|json)$/i.test(spec)) return pre + q + EMPTY + q;
+      if (/\\.(css|scss|sass|less)$/i.test(spec)) return pre + q + EMPTY + q;
+      if (/\\.(svg|json)$/i.test(spec)) {
+        return pre + q + assetModule(resolveAssetPath(path, spec)) + q;
+      }
+      if (/\\.(png|jpe?g|gif|webp|avif|ico|bmp)$/i.test(spec)) return pre + q + EMPTY + q;
       if (spec[0] === ".") {
         var rp = resolveLocal(path, spec);
         return rp ? pre + q + build(rp) + q : pre + q + EMPTY + q;

@@ -318,7 +318,7 @@ function MessageBubble({
   return (
     <div className={isUser ? "flex min-w-0 justify-end" : "flex min-w-0 justify-start"}>
       <div
-        className={`min-w-0 max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-2.5 text-sm ${
+        className={`min-w-0 max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-2.5 text-sm [overflow-wrap:anywhere] ${
           isUser
             ? "bg-primary text-primary-foreground"
             : "bg-muted text-foreground"

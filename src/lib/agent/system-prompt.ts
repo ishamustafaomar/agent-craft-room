@@ -87,6 +87,24 @@ const CODING_GUIDELINES_BLOCK = `<coding_guidelines>
 - Prefer a modern, clean, responsive UI with sensible spacing and a cohesive color system.
 </coding_guidelines>`;
 
+const PREVIEW_FIDELITY_BLOCK = `<preview_fidelity>
+The app renders in a lightweight client-side preview (no real build step, no bundler asset pipeline). Follow these rules so what you build actually shows up:
+
+**Images & media**
+- Use REAL images via remote URLs (e.g. https://images.unsplash.com/... or https://picsum.photos/seed/<word>/800/600) directly in <img src="..."> or as CSS background-image. This is how you "do pictures" — do it generously for hero sections, cards, avatars, and galleries.
+- For vector graphics and logos, write inline <svg> markup, or import a local .svg file (those are inlined and will render).
+- Do NOT import local raster image files (.png/.jpg/.jpeg/.gif/.webp). They cannot be bundled in the preview and render as nothing. Use remote URLs instead.
+- lucide-react icons are fine for UI icons, but never rely on icons when the user asks for actual photos/illustrations — use real images.
+
+**Navigation (avoid the blank/black screen on tab clicks)**
+- Prefer in-component state for tabs/sections/views (e.g. useState to switch panels) instead of full client-side routing.
+- If you need multiple pages, use react-router-dom's HashRouter (not BrowserRouter) so navigation works inside the preview iframe.
+- Never trigger full-page navigations (window.location =, <a href> to internal paths without a router). They reload the preview to a blank document.
+
+**Resilience**
+- Wrap the app in a React error boundary so a single component error shows a friendly message instead of blanking the whole screen.
+</preview_fidelity>`;
+
 const RULES_BLOCK = `<rules>
 - Only modify files inside the project. Never touch files outside the project root.
 - Do not run destructive commands (e.g. rm -rf /, formatting disks). Keep commands scoped to the project.
@@ -181,6 +199,7 @@ export function buildSystemPrompt(opts: SystemPromptOptions = {}): string {
     FILE_EDITING_BLOCK,
     DEVELOPMENT_WORKFLOW_BLOCK,
     CODING_GUIDELINES_BLOCK,
+    PREVIEW_FIDELITY_BLOCK,
     APP_BLUEPRINT_BLOCK,
     RULES_BLOCK,
     rules,
@@ -197,4 +216,10 @@ export const DEFAULT_AI_RULES = `# Tech Stack
 - Keep source code in the src folder. Put components in src/components and pages/screens in src/pages.
 - The entry/main screen lives in src/App.tsx; update it to render new components so the user can see them.
 - Use lucide-react for icons (already available).
-- Keep files small and focused.`;
+- Keep files small and focused.
+
+# Images & Preview
+- Use real images from remote URLs (e.g. https://images.unsplash.com or https://picsum.photos/seed/<word>/800/600) in <img> or CSS backgrounds. Do not import local raster files (.png/.jpg/.webp) — they don't render in the preview.
+- Use inline <svg> or imported .svg files for vector graphics and logos.
+- Prefer state-based tab/section switching; if you need real routing use HashRouter, never BrowserRouter or full-page navigation.
+- Wrap the app in a React error boundary so one component error never blanks the whole screen.`;

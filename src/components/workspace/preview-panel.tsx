@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import type { FileMap } from "@/lib/execution/types";
@@ -49,6 +49,14 @@ export function PreviewPanel({
 }: PreviewPanelProps) {
   const [tab, setTab] = useState<"preview" | "terminal">("preview");
   const [iframeKey, setIframeKey] = useState(0);
+  // The workspace's own top-level URL. Opening it in a real new tab (via an
+  // <a target="_blank">, which works even when window.open is blocked inside the
+  // embedded preview iframe) gives a cross-origin-isolated tab that can run the
+  // live sandbox.
+  const [selfUrl, setSelfUrl] = useState("");
+  useEffect(() => {
+    setSelfUrl(window.location.href);
+  }, []);
   const fileCount = Object.keys(files).length;
 
   const isWorking =
@@ -140,15 +148,15 @@ export function PreviewPanel({
                   Static preview — open a full tab for the live sandbox.
                 </span>
                 <Button
+                  asChild
                   size="sm"
                   variant="secondary"
                   className="h-6 shrink-0 gap-1 px-2 text-xs"
-                  onClick={() =>
-                    window.open(window.location.href, "_blank", "noopener,noreferrer")
-                  }
                 >
-                  <ExternalLink className="h-3 w-3" />
-                  Full tab
+                  <a href={selfUrl || "#"} target="_blank" rel="noreferrer">
+                    <ExternalLink className="h-3 w-3" />
+                    Full tab
+                  </a>
                 </Button>
               </div>
               <iframe
@@ -174,13 +182,11 @@ export function PreviewPanel({
                     {fileCount} file{fileCount === 1 ? "" : "s"} here.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    <Button
-                      onClick={() =>
-                        window.open(window.location.href, "_blank", "noopener,noreferrer")
-                      }
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Open full tab
+                    <Button asChild>
+                      <a href={selfUrl || "#"} target="_blank" rel="noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                        Open full tab
+                      </a>
                     </Button>
                     <Button variant="outline" onClick={onRetryIsolation}>
                       <RefreshCw className="h-4 w-4" />
