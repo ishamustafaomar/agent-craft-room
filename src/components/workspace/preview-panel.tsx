@@ -49,6 +49,14 @@ export function PreviewPanel({
 }: PreviewPanelProps) {
   const [tab, setTab] = useState<"preview" | "terminal">("preview");
   const [iframeKey, setIframeKey] = useState(0);
+  // The workspace's own top-level URL. Opening it in a real new tab (via an
+  // <a target="_blank">, which works even when window.open is blocked inside the
+  // embedded preview iframe) gives a cross-origin-isolated tab that can run the
+  // live sandbox.
+  const [selfUrl, setSelfUrl] = useState("");
+  useEffect(() => {
+    setSelfUrl(window.location.href);
+  }, []);
   const fileCount = Object.keys(files).length;
 
   const isWorking =
