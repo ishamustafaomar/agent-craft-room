@@ -3,7 +3,7 @@ import remarkGfm from "remark-gfm";
 
 export function MarkdownMessage({ content }: { content: string }) {
   return (
-    <div className="prose-chat space-y-2 text-sm leading-relaxed">
+    <div className="prose-chat min-w-0 space-y-2 break-words text-sm leading-relaxed [overflow-wrap:anywhere]">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
