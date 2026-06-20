@@ -238,7 +238,11 @@ window.__ENTRY__ = ${JSON.stringify(entry)};
       throw new Error("Failed to compile " + path + ":\\n" + (e && e.message ? e.message : e));
     }
     code = code.replace(importRe, function(m, pre, q, spec){
-      if (/\\.(css|scss|sass|less|svg|png|jpg|jpeg|gif|webp|avif|json)$/i.test(spec)) return pre + q + EMPTY + q;
+      if (/\\.(css|scss|sass|less)$/i.test(spec)) return pre + q + EMPTY + q;
+      if (/\\.(svg|json)$/i.test(spec)) {
+        return pre + q + assetModule(resolveAssetPath(path, spec)) + q;
+      }
+      if (/\\.(png|jpe?g|gif|webp|avif|ico|bmp)$/i.test(spec)) return pre + q + EMPTY + q;
       if (spec[0] === ".") {
         var rp = resolveLocal(path, spec);
         return rp ? pre + q + build(rp) + q : pre + q + EMPTY + q;
