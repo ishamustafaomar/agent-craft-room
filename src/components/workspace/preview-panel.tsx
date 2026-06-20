@@ -148,15 +148,15 @@ export function PreviewPanel({
                   Static preview — open a full tab for the live sandbox.
                 </span>
                 <Button
+                  asChild
                   size="sm"
                   variant="secondary"
                   className="h-6 shrink-0 gap-1 px-2 text-xs"
-                  onClick={() =>
-                    window.open(window.location.href, "_blank", "noopener,noreferrer")
-                  }
                 >
-                  <ExternalLink className="h-3 w-3" />
-                  Full tab
+                  <a href={selfUrl || "#"} target="_blank" rel="noreferrer">
+                    <ExternalLink className="h-3 w-3" />
+                    Full tab
+                  </a>
                 </Button>
               </div>
               <iframe
