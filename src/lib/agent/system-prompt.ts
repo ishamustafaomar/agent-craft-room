@@ -199,6 +199,7 @@ export function buildSystemPrompt(opts: SystemPromptOptions = {}): string {
     FILE_EDITING_BLOCK,
     DEVELOPMENT_WORKFLOW_BLOCK,
     CODING_GUIDELINES_BLOCK,
+    PREVIEW_FIDELITY_BLOCK,
     APP_BLUEPRINT_BLOCK,
     RULES_BLOCK,
     rules,
