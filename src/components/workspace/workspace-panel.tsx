@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Monitor, Code2, Download, Loader2 } from "lucide-react";
@@ -48,13 +47,6 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={() => setView("preview")}>
-          <Monitor className="mr-2 h-4 w-4" /> Preview
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setView("code")}>
-          <Code2 className="mr-2 h-4 w-4" /> Code &amp; files
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={props.onExport} disabled={props.exporting}>
           {props.exporting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -67,13 +59,21 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     </DropdownMenu>
   );
 
+  // A visible Preview/Code switch — clearer than burying it in a menu.
+  const viewToggle = <ViewToggle view={view} onChange={setView} />;
+
+  const headerActions = (
+    <div className="flex items-center gap-1.5">
+      {viewToggle}
+      {menu}
+    </div>
+  );
+
   if (view === "code") {
     return (
       <div className="flex h-full flex-col bg-card">
-        <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border px-3">
-          <Code2 className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs font-medium">Code</span>
-          <div className="ml-auto">{menu}</div>
+        <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border px-2 py-1.5">
+          {headerActions}
         </div>
         <div className="min-h-0 flex-1">
           <EditorPanel
@@ -100,7 +100,58 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
       embedded={props.embedded}
       onStart={props.onStart}
       onRetryIsolation={props.onRetryIsolation}
-      headerActions={menu}
+      headerActions={headerActions}
     />
+  );
+}
+
+function ViewToggle({
+  view,
+  onChange,
+}: {
+  view: "preview" | "code";
+  onChange: (v: "preview" | "code") => void;
+}) {
+  return (
+    <div className="flex items-center rounded-lg border border-border bg-background/60 p-0.5">
+      <ToggleItem
+        active={view === "preview"}
+        onClick={() => onChange("preview")}
+        icon={<Monitor className="h-3.5 w-3.5" />}
+        label="Preview"
+      />
+      <ToggleItem
+        active={view === "code"}
+        onClick={() => onChange("code")}
+        icon={<Code2 className="h-3.5 w-3.5" />}
+        label="Code"
+      />
+    </div>
+  );
+}
+
+function ToggleItem({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+        active ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }

@@ -49,13 +49,28 @@ function findEntry(files: FileMap): string | null {
   return cand ? "/" + cand : null;
 }
 
-// Heuristic: does this project use Tailwind? Either via the @tailwind/@import
-// directives in CSS or a tailwind config file. When true we load the Play CDN so
-// utility classes generated at runtime get styled.
+// Recognizable Tailwind utility usage inside a class/className attribute. Kept
+// deliberately specific (prefixed utilities with values, or a few unambiguous
+// keywords) so plain hand-written CSS class names don't trigger a false match.
+const TAILWIND_CLASS_RE =
+  /\b(?:p|px|py|pt|pb|pl|pr|m|mx|my|mt|mb|ml|mr|gap|w|h|min-w|max-w|min-h|max-h|text|bg|border|rounded|shadow|font|leading|tracking|grid-cols|col-span|space-x|space-y|gap-x|gap-y|z|opacity|ring|from|via|to)-[a-z0-9[]/
+    .source;
+const TAILWIND_KEYWORD_RE =
+  /\b(?:flex|grid|hidden|inline-flex|items-(?:center|start|end)|justify-(?:center|between|around|start|end)|absolute|relative|sticky|fixed|backdrop-blur|transition|truncate)\b/
+    .source;
+const TAILWIND_ATTR_RE = new RegExp(
+  `class(?:Name)?\\s*=\\s*["'\`][^"'\`]*(?:${TAILWIND_CLASS_RE}|${TAILWIND_KEYWORD_RE})`,
+);
+
+// Does this project rely on Tailwind? True when it has the @tailwind/@import
+// directives or a config file, OR when its markup actually uses Tailwind utility
+// classes. When true we load the Play CDN so those classes get styled — this is
+// the agent's default styling stack, so it must "just work" without build setup.
 function usesTailwind(files: FileMap): boolean {
   for (const [k, v] of Object.entries(files)) {
     if (/tailwind\.config\.(js|ts|cjs|mjs)$/.test(k)) return true;
     if (k.endsWith(".css") && /@tailwind\b|@import\s+["']tailwindcss/.test(v)) return true;
+    if (/\.(tsx|jsx|ts|js|html)$/.test(k) && TAILWIND_ATTR_RE.test(v)) return true;
   }
   return false;
 }
@@ -92,9 +107,7 @@ export function buildStaticPreviewDoc(files: FileMap): string | null {
     .replace(/<\/script>/gi, "<\\/script>")
     .replace(/<!--/g, "<\\!--");
 
-  const tailwindTag = tailwind
-    ? `<script src="https://cdn.tailwindcss.com"></script>`
-    : "";
+  const tailwindTag = tailwind ? `<script src="https://cdn.tailwindcss.com"></script>` : "";
 
   return `<!doctype html>
 <html lang="en">

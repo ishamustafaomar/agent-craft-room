@@ -16,7 +16,6 @@ export interface Template {
 // Persistent per-project agent guidance, injected into every system prompt.
 const AI_RULES_MD = DEFAULT_AI_RULES + "\n";
 
-
 const VITE_INDEX_HTML = `<!doctype html>
 <html lang="en">
   <head>
@@ -93,10 +92,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 `;
 
-const VITE_CSS = `:root {
-  font-family: system-ui, -apple-system, sans-serif;
-  color: #e7e9ee;
-  background: #0b0d12;
+const VITE_CSS = `@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg: #fafaf9;
+  --fg: #1c1917;
+  --muted: #78716c;
+  --card: #ffffff;
+  --border: #e7e5e4;
+  --accent: #6366f1;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
@@ -106,16 +113,33 @@ body { margin: 0; }
   place-items: center;
   text-align: center;
   padding: 2rem;
+  background:
+    radial-gradient(60rem 60rem at 80% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent),
+    var(--bg);
 }
 .card {
-  background: #151821;
-  border: 1px solid #232838;
-  border-radius: 16px;
-  padding: 2.5rem 3rem;
-  box-shadow: 0 20px 60px -20px rgba(0,0,0,0.6);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem 3.25rem;
+  box-shadow: 0 24px 60px -28px rgba(24, 24, 27, 0.25);
+  max-width: 30rem;
 }
-h1 { margin: 0 0 .5rem; font-size: 2rem; }
-p { margin: 0; color: #9aa3b2; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 1.25rem;
+}
+.badge .dot { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: var(--accent); }
+h1 { margin: 0 0 0.6rem; font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+p { margin: 0; color: var(--muted); line-height: 1.6; }
 `;
 
 function viteApp(heading: string, sub: string) {
@@ -123,6 +147,7 @@ function viteApp(heading: string, sub: string) {
   return (
     <div className="app">
       <div className="card">
+        <span className="badge"><span className="dot" /> Ready to build</span>
         <h1>${heading}</h1>
         <p>${sub}</p>
       </div>
