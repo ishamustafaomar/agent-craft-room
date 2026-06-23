@@ -83,9 +83,35 @@ const CODING_GUIDELINES_BLOCK = `<coding_guidelines>
 - Default stack for new apps: Vite + React + TypeScript + Tailwind CSS, unless the user asks otherwise.
 - Always include a valid package.json with the scripts and dependencies you rely on.
 - Write complete, working files — no placeholders, no "rest of code here".
-- Keep components small and composable; use semantic, accessible markup.
-- Prefer a modern, clean, responsive UI with sensible spacing and a cohesive color system.
+- Keep components small and composable (aim for < ~150 lines each); extract reusable pieces instead of duplicating markup.
+- Use semantic, accessible markup: real landmarks (\`header\`/\`nav\`/\`main\`/\`footer\`), labelled controls, alt text, and visible focus states.
+- Co-locate a small design system: define colors, spacing, and typography as tokens (CSS variables / Tailwind theme) and reuse them — never scatter one-off hex values.
 </coding_guidelines>`;
+
+// The defining trait of a Lovable-grade build: it looks designed, not generated.
+// This block pushes the agent toward bold, polished, production-quality UI by
+// default — the single biggest lever on perceived output quality.
+const DESIGN_EXCELLENCE_BLOCK = `<design_excellence>
+Treat every build as a portfolio piece. The first render must look like a real, designed product — never a generic bootstrap/wireframe. This is the most important quality bar: a working-but-plain result is a failure.
+
+**Make a deliberate aesthetic choice.** Before coding a UI, pick a clear visual direction that fits the product (e.g. clean & minimal, warm & editorial, bold & playful, sleek dark SaaS, glassy & modern) and commit to it consistently. Avoid the default "unstyled Tailwind" look.
+
+**Visual foundations**
+- **Color**: choose a cohesive palette with a real primary/accent, neutral scale, and semantic states. Use it intentionally — don't make everything gray. Ensure WCAG AA contrast.
+- **Typography**: establish hierarchy with deliberate sizes/weights/line-height. Pair a characterful display font with a readable body font (load via a CDN \`<link>\` when it elevates the design). Avoid walls of same-size text.
+- **Space & rhythm**: use generous, consistent spacing on a scale (4/8px). Give content room to breathe; align everything to a grid. Constrain line length for readability.
+- **Depth & polish**: layer with subtle shadows, soft borders, rounded corners, and gradients/texture where they help. Add tasteful micro-interactions — hover/active/focus states and smooth transitions (~150–250ms).
+
+**Completeness (don't ship a skeleton)**
+- Fill the page with real, contextual content — believable copy, names, numbers, and imagery. Never leave lorem ipsum or "TODO" sections.
+- Design every state: empty, loading (skeletons/spinners), error, and success — not just the happy path.
+- Make it fully **responsive**: design mobile-first and verify it holds up from phone to wide desktop.
+- Use real imagery generously (see preview_fidelity for sources) for heroes, cards, avatars, and galleries.
+- Include the supporting structure a real product has: navigation, a footer, sensible page sections — not a single bare component.
+
+**Restraint**
+- Polished does not mean noisy. Prefer a few strong, consistent ideas over many competing ones. Animations should feel purposeful, never gratuitous. Accessibility is part of quality, not optional.
+</design_excellence>`;
 
 const PREVIEW_FIDELITY_BLOCK = `<preview_fidelity>
 The app renders in a lightweight client-side preview (no real build step, no bundler asset pipeline). Follow these rules so what you build actually shows up:
@@ -184,9 +210,7 @@ export function buildSystemPrompt(opts: SystemPromptOptions = {}): string {
   }
 
   if (mode === "plan") {
-    return [PLAN_ROLE_BLOCK, context, TOOL_CALLING_BLOCK, rules]
-      .filter(Boolean)
-      .join("\n\n");
+    return [PLAN_ROLE_BLOCK, context, TOOL_CALLING_BLOCK, rules].filter(Boolean).join("\n\n");
   }
 
   return [
@@ -199,6 +223,7 @@ export function buildSystemPrompt(opts: SystemPromptOptions = {}): string {
     FILE_EDITING_BLOCK,
     DEVELOPMENT_WORKFLOW_BLOCK,
     CODING_GUIDELINES_BLOCK,
+    DESIGN_EXCELLENCE_BLOCK,
     PREVIEW_FIDELITY_BLOCK,
     APP_BLUEPRINT_BLOCK,
     RULES_BLOCK,
@@ -216,10 +241,20 @@ export const DEFAULT_AI_RULES = `# Tech Stack
 - Keep source code in the src folder. Put components in src/components and pages/screens in src/pages.
 - The entry/main screen lives in src/App.tsx; update it to render new components so the user can see them.
 - Use lucide-react for icons (already available).
-- Keep files small and focused.
+- Keep files small and focused (aim for under ~150 lines per component).
+
+# Design Quality (the bar)
+- Every screen should look like a real, designed product on first render — never a plain, unstyled wireframe.
+- Commit to one clear visual direction (minimal, editorial, playful, dark SaaS, etc.) and apply it consistently.
+- Define a small design system up front: a cohesive color palette (primary/accent + neutrals + semantic states), a type scale with clear hierarchy, and consistent spacing on a 4/8px scale. Reuse these tokens — never scatter one-off hex values.
+- Add polish: deliberate typography, generous whitespace, subtle shadows/borders, rounded corners, and smooth hover/focus/active transitions (~150–250ms).
+- Fill the UI with real, contextual content (believable copy, numbers, imagery) — no lorem ipsum, no empty TODO sections.
+- Design empty, loading, and error states, not just the happy path.
+- Make everything responsive (mobile-first) and accessible (semantic landmarks, labelled controls, AA contrast, visible focus).
 
 # Images & Preview
 - Use real images from remote URLs (e.g. https://images.unsplash.com or https://picsum.photos/seed/<word>/800/600) in <img> or CSS backgrounds. Do not import local raster files (.png/.jpg/.webp) — they don't render in the preview.
 - Use inline <svg> or imported .svg files for vector graphics and logos.
+- Load characterful fonts via a CDN <link> when they elevate the design.
 - Prefer state-based tab/section switching; if you need real routing use HashRouter, never BrowserRouter or full-page navigation.
 - Wrap the app in a React error boundary so one component error never blanks the whole screen.`;
