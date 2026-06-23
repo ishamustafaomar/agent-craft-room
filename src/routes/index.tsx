@@ -55,11 +55,13 @@ function Landing() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const startBuilding = () => {
+  // Accepts an explicit prompt (e.g. from an example card) so it never reads a
+  // stale `prompt` state value set in the same click.
+  const startBuilding = (text: string = prompt) => {
     const dest = signedIn ? "/dashboard" : "/auth";
-    if (prompt.trim()) {
+    if (text.trim()) {
       try {
-        sessionStorage.setItem("breezy:firstPrompt", prompt.trim());
+        sessionStorage.setItem("breezy:firstPrompt", text.trim());
       } catch {
         /* sessionStorage may be unavailable; ignore */
       }
@@ -233,10 +235,7 @@ function Landing() {
               <button
                 key={item.title}
                 type="button"
-                onClick={() => {
-                  setPrompt(item.prompt);
-                  startBuilding();
-                }}
+                onClick={() => startBuilding(item.prompt)}
                 className="group overflow-hidden rounded-2xl border border-white/60 bg-white/60 text-left shadow-soft backdrop-blur transition-all hover:-translate-y-0.5 hover:border-white"
               >
                 <div className="relative aspect-[16/10] overflow-hidden">
