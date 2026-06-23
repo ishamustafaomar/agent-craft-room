@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -63,9 +63,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard · Breezy" },
-      { name: "description", content: "Your Breezy projects. Create, manage, and vibe-code beautiful apps in minutes." },
+      {
+        name: "description",
+        content: "Your Breezy projects. Create, manage, and vibe-code beautiful apps in minutes.",
+      },
       { property: "og:title", content: "Dashboard · Breezy" },
-      { property: "og:description", content: "Your Breezy projects. Create, manage, and vibe-code beautiful apps in minutes." },
+      {
+        property: "og:description",
+        content: "Your Breezy projects. Create, manage, and vibe-code beautiful apps in minutes.",
+      },
     ],
   }),
   component: Dashboard,
@@ -94,6 +100,19 @@ function Dashboard() {
 
   const [prompt, setPrompt] = useState("");
   const [template] = useState("blank");
+
+  // Pick up a prompt handed off from the landing-page hero box, if any.
+  useEffect(() => {
+    try {
+      const handoff = sessionStorage.getItem("breezy:firstPrompt");
+      if (handoff) {
+        setPrompt(handoff);
+        sessionStorage.removeItem("breezy:firstPrompt");
+      }
+    } catch {
+      /* sessionStorage may be unavailable; ignore */
+    }
+  }, []);
   const [planMode, setPlanMode] = useState<"Build" | "Plan">("Build");
   const [activeTab, setActiveTab] = useState<ProjectTab>("My projects");
   const [search, setSearch] = useState("");
@@ -113,14 +132,13 @@ function Dashboard() {
     }
   }
 
-
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: () => listFn(),
   });
 
   const firstName = useMemo(() => {
-    const meta = (user?.user_metadata as { name?: string; full_name?: string } | undefined);
+    const meta = user?.user_metadata as { name?: string; full_name?: string } | undefined;
     const raw = meta?.name || meta?.full_name || user?.email?.split("@")[0] || "";
     if (!raw) return "there";
     const part = raw.split(/[\s._-]+/)[0];
@@ -215,7 +233,6 @@ function Dashboard() {
           </button>
         </div>
 
-
         {/* Workspace switcher */}
         <div className="px-3">
           <DropdownMenu>
@@ -278,7 +295,6 @@ function Dashboard() {
           >
             <Plug className="h-4 w-4" /> Connectors
           </button>
-
         </nav>
 
         {/* Projects nav */}
@@ -297,7 +313,11 @@ function Dashboard() {
               <UserIcon className="h-4 w-4" /> Created by me
             </button>
 
-            <button type="button" onClick={() => setActiveTab("Shared with me")} className={navMuted}>
+            <button
+              type="button"
+              onClick={() => setActiveTab("Shared with me")}
+              className={navMuted}
+            >
               <Users className="h-4 w-4" /> Shared with me
             </button>
           </div>
@@ -407,7 +427,6 @@ function Dashboard() {
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
 
-
           <h1 className="font-display text-4xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)] sm:text-5xl">
             What should we build, {firstName}?
           </h1>
@@ -431,7 +450,7 @@ function Dashboard() {
                   createMut.mutate({
                     name:
                       deriveName(prompt) === "Untitled App"
-                        ? TEMPLATES[templateId]?.name ?? "Untitled App"
+                        ? (TEMPLATES[templateId]?.name ?? "Untitled App")
                         : deriveName(prompt),
                     template: templateId,
                   })
@@ -578,7 +597,11 @@ function Dashboard() {
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/60">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-white/60"
+                            >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
