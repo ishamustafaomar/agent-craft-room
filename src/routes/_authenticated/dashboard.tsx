@@ -52,7 +52,7 @@ import {
   ChevronDown,
   PanelLeft,
   Plus,
-  Mic,
+  Palette,
   Gift,
   Zap,
 } from "lucide-react";
@@ -488,8 +488,9 @@ function Dashboard() {
                       size="icon"
                       className="h-9 w-9 rounded-full text-[oklch(0.45_0.03_280)] hover:bg-white/70"
                       aria-label="Design directions"
+                      title="Pick a design direction"
                     >
-                      <Mic className="h-4 w-4" />
+                      <Palette className="h-4 w-4" />
                     </Button>
                   }
                 />
