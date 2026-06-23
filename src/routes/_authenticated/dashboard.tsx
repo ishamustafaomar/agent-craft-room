@@ -45,7 +45,6 @@ import {
   Home,
   Search,
   Compass,
-  Plug,
   FolderGit2,
   Star,
   User as UserIcon,
@@ -56,7 +55,6 @@ import {
   Mic,
   Gift,
   Zap,
-  ArrowRight,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -87,6 +85,15 @@ const PROJECT_TABS = [
 ] as const;
 
 type ProjectTab = (typeof PROJECT_TABS)[number];
+
+// Click-to-fill starter ideas shown under the prompt box.
+const EXAMPLE_PROMPTS = [
+  "A landing page for a coffee brand",
+  "A SaaS analytics dashboard",
+  "A recipe app with search",
+  "A personal portfolio site",
+  "A habit tracker with streaks",
+];
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -284,17 +291,6 @@ function Dashboard() {
           <Link to="/blog/how-to-build-web-app-with-ai" className={navMuted}>
             <Compass className="h-4 w-4" /> Resources
           </Link>
-          <button
-            type="button"
-            onClick={() =>
-              toast.message("Connectors", {
-                description: "Connect your tools — coming soon to Breezy.",
-              })
-            }
-            className={navMuted}
-          >
-            <Plug className="h-4 w-4" /> Connectors
-          </button>
         </nav>
 
         {/* Projects nav */}
@@ -413,19 +409,10 @@ function Dashboard() {
         )}
         {/* Hero */}
         <section className="flex flex-col items-center px-6 pt-16 pb-8 text-center sm:pt-24">
-          <button
-            type="button"
-            onClick={() =>
-              toast.message("Connectors", {
-                description: "Connect your tools — coming soon to Breezy.",
-              })
-            }
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-sm text-[oklch(0.4_0.03_280)] shadow-soft backdrop-blur transition-colors hover:bg-white/80"
-          >
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-sm text-[oklch(0.4_0.03_280)] shadow-soft backdrop-blur">
             <Sparkles className="h-4 w-4 text-[oklch(0.55_0.12_300)]" />
-            Connect all your tools
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+            Describe an idea — Breezy builds it live
+          </div>
 
           <h1 className="font-display text-4xl font-semibold tracking-tight text-[oklch(0.22_0.03_280)] sm:text-5xl">
             What should we build, {firstName}?
@@ -513,6 +500,20 @@ function Dashboard() {
                 </Button>
               </div>
             </div>
+          </div>
+
+          {/* Example prompts — click to fill the box */}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            {EXAMPLE_PROMPTS.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => setPrompt(ex)}
+                className="rounded-full border border-white/60 bg-white/50 px-3 py-1.5 text-xs text-[oklch(0.42_0.03_280)] transition-colors hover:bg-white/80 hover:text-[oklch(0.22_0.03_280)]"
+              >
+                {ex}
+              </button>
+            ))}
           </div>
         </section>
 
