@@ -59,8 +59,7 @@ export function PreviewPanel({
   }, []);
   const fileCount = Object.keys(files).length;
 
-  const isWorking =
-    status === "booting" || status === "installing" || status === "starting";
+  const isWorking = status === "booting" || status === "installing" || status === "starting";
 
   // When the live sandbox can't run (no cross-origin isolation), fall back to a
   // client-only static render of the project so the pane still shows the app.
@@ -76,7 +75,7 @@ export function PreviewPanel({
           active={tab === "preview"}
           onClick={() => setTab("preview")}
           icon={<Monitor className="h-3.5 w-3.5" />}
-          label="Preview"
+          label="App"
         />
         <TabButton
           active={tab === "terminal"}
@@ -176,10 +175,10 @@ export function PreviewPanel({
                   </div>
                   <p className="text-sm font-medium">Live preview runs in a full tab</p>
                   <p className="max-w-sm text-balance text-xs leading-relaxed text-muted-foreground">
-                    The in-browser sandbox needs a cross-origin-isolated tab, which the
-                    embedded preview can&apos;t provide. Open this workspace in a full
-                    browser tab to run it. The agent can still generate and edit all{" "}
-                    {fileCount} file{fileCount === 1 ? "" : "s"} here.
+                    The in-browser sandbox needs a cross-origin-isolated tab, which the embedded
+                    preview can&apos;t provide. Open this workspace in a full browser tab to run it.
+                    The agent can still generate and edit all {fileCount} file
+                    {fileCount === 1 ? "" : "s"} here.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     <Button asChild>
@@ -199,8 +198,7 @@ export function PreviewPanel({
                   <Loader2 className="h-7 w-7 animate-spin text-primary" />
                   <p className="text-sm font-medium">{STATUS_LABEL[status]}</p>
                   <p className="max-w-xs text-xs text-muted-foreground">
-                    Spinning up your app in the browser. Watch the Terminal tab for
-                    progress.
+                    Spinning up your app in the browser. Watch the Terminal tab for progress.
                   </p>
                 </>
               ) : (
@@ -210,8 +208,8 @@ export function PreviewPanel({
                   </div>
                   <p className="text-sm font-medium">Run your app</p>
                   <p className="max-w-xs text-xs text-muted-foreground">
-                    {fileCount} file{fileCount === 1 ? "" : "s"} ready. Boot the
-                    in-browser sandbox to install dependencies and see a live preview.
+                    {fileCount} file{fileCount === 1 ? "" : "s"} ready. Boot the in-browser sandbox
+                    to install dependencies and see a live preview.
                   </p>
                   <Button onClick={onStart} className="gap-1.5">
                     <Play className="h-4 w-4" />

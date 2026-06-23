@@ -27,6 +27,14 @@ import { MarkdownMessage } from "./markdown-message";
 import { Sparkles, ArrowUp, Loader2, Square } from "lucide-react";
 import { toast } from "sonner";
 
+// Quick-start ideas shown in the empty chat state; click to fill the box.
+const CHAT_SUGGESTIONS = [
+  "Build a todo app with dark mode",
+  "Add a contact form",
+  "Make it look more modern",
+  "Add a hero section with an image",
+];
+
 interface ChatPanelProps {
   projectId: string;
   projectName: string;
@@ -176,9 +184,7 @@ export function ChatPanel({
 
   function handleApproveBlueprint() {
     if (isBusy) return;
-    submitPrompt(
-      "The app blueprint has been approved. Proceed with the full implementation now.",
-    );
+    submitPrompt("The app blueprint has been approved. Proceed with the full implementation now.");
   }
 
   // Auto-run the prompt the user typed on the dashboard for a fresh project.
@@ -192,28 +198,38 @@ export function ChatPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPrompt]);
 
-
   return (
     <div className="flex h-full flex-col bg-card">
       <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
         <Sparkles className="h-4 w-4 shrink-0 text-primary" />
         <span className="truncate text-sm font-medium">AI Agent</span>
         {headerActions && (
-          <div className="ml-auto flex shrink-0 items-center gap-1.5">
-            {headerActions}
-          </div>
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">{headerActions}</div>
         )}
       </div>
 
       <ScrollArea className="min-w-0 flex-1">
         <div ref={scrollRef} className="flex min-w-0 flex-col gap-4 p-4">
           {messages.length === 0 && (
-            <div className="mt-10 text-center text-sm text-muted-foreground">
-              <Sparkles className="mx-auto mb-3 h-8 w-8 opacity-50" />
+            <div className="mt-10 flex flex-col items-center text-center text-sm text-muted-foreground">
+              <Sparkles className="mb-3 h-8 w-8 opacity-50" />
               <p>Describe what you want to build.</p>
-              <p className="mt-1 text-xs">
-                e.g. "Build a todo app with dark mode and local storage."
-              </p>
+              <p className="mt-1 text-xs">Try one of these to get started:</p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {CHAT_SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => {
+                      setInput(s);
+                      textareaRef.current?.focus();
+                    }}
+                    className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-muted"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {messages.map((message, idx) => (
@@ -221,9 +237,7 @@ export function ChatPanel({
               key={message.id}
               message={message}
               onApproveBlueprint={
-                !isBusy && idx === messages.length - 1
-                  ? handleApproveBlueprint
-                  : undefined
+                !isBusy && idx === messages.length - 1 ? handleApproveBlueprint : undefined
               }
             />
           ))}
@@ -251,13 +265,20 @@ export function ChatPanel({
             className="max-h-40 min-h-[44px] resize-none border-0 bg-transparent p-1.5 shadow-none focus-visible:ring-0"
           />
           <div className="flex flex-wrap items-center gap-2">
-            <Select value={mode} onValueChange={(v) => onModeChange(v as "build" | "plan")}>
+            <Select value={mode} onValueChange={(v) => onModeChange(v as "build" | "ask" | "plan")}>
               <SelectTrigger className="h-8 w-[100px] text-xs">
                 <SelectValue placeholder="Mode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="build" className="text-xs">Build</SelectItem>
-                <SelectItem value="plan" className="text-xs">Plan</SelectItem>
+                <SelectItem value="build" className="text-xs">
+                  Build
+                </SelectItem>
+                <SelectItem value="ask" className="text-xs">
+                  Ask
+                </SelectItem>
+                <SelectItem value="plan" className="text-xs">
+                  Plan
+                </SelectItem>
               </SelectContent>
             </Select>
             <Select value={model} onValueChange={onModelChange}>
@@ -319,9 +340,7 @@ function MessageBubble({
     <div className={isUser ? "flex min-w-0 justify-end" : "flex min-w-0 justify-start"}>
       <div
         className={`min-w-0 max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-2.5 text-sm [overflow-wrap:anywhere] ${
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
+          isUser ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
         }`}
       >
         {message.parts.map((part, i) => {
@@ -335,9 +354,7 @@ function MessageBubble({
             );
           }
           if (part.type.startsWith("tool-")) {
-            return (
-              <ToolActivity key={i} part={part} onApproveBlueprint={onApproveBlueprint} />
-            );
+            return <ToolActivity key={i} part={part} onApproveBlueprint={onApproveBlueprint} />;
           }
           return null;
         })}
