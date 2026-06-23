@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -108,17 +108,24 @@ function Dashboard() {
   const [prompt, setPrompt] = useState("");
   const [template] = useState("blank");
 
-  // Pick up a prompt handed off from the landing-page hero box, if any.
+  // Pick up a prompt handed off from the landing page (hero box or an example
+  // card) and immediately start building it — so clicking an example actually
+  // creates the project and opens the workspace, not just lands here.
+  const handoffRef = useRef(false);
   useEffect(() => {
+    if (handoffRef.current) return;
+    let handoff: string | null = null;
     try {
-      const handoff = sessionStorage.getItem("breezy:firstPrompt");
-      if (handoff) {
-        setPrompt(handoff);
-        sessionStorage.removeItem("breezy:firstPrompt");
-      }
+      handoff = sessionStorage.getItem("breezy:firstPrompt");
+      if (handoff) sessionStorage.removeItem("breezy:firstPrompt");
     } catch {
       /* sessionStorage may be unavailable; ignore */
     }
+    if (!handoff?.trim()) return;
+    handoffRef.current = true;
+    setPrompt(handoff);
+    createMut.mutate({ name: deriveName(handoff), template, prompt: handoff });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [planMode, setPlanMode] = useState<"Build" | "Plan">("Build");
   const [activeTab, setActiveTab] = useState<ProjectTab>("My projects");
@@ -162,10 +169,11 @@ function Dashboard() {
   }, [projects, search]);
 
   const createMut = useMutation({
-    mutationFn: (vars: { name: string; template: string }) => createFn({ data: vars }),
-    onSuccess: (project) => {
+    mutationFn: (vars: { name: string; template: string; prompt?: string }) =>
+      createFn({ data: { name: vars.name, template: vars.template } }),
+    onSuccess: (project, vars) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      const promptText = prompt.trim();
+      const promptText = vars.prompt?.trim();
       setPrompt("");
       navigate({
         to: "/project/$projectId",
@@ -212,7 +220,7 @@ function Dashboard() {
 
   function handleCreateFromPrompt() {
     if (createMut.isPending) return;
-    createMut.mutate({ name: deriveName(prompt), template });
+    createMut.mutate({ name: deriveName(prompt), template, prompt });
   }
 
   const navMuted =
