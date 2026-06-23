@@ -85,6 +85,12 @@ function Landing() {
             >
               How it works
             </a>
+            <a
+              href="#gallery"
+              className={`hidden rounded-md px-3 py-2 text-sm transition-colors hover:bg-white/50 sm:block ${MUTED}`}
+            >
+              Examples
+            </a>
             {signedIn ? (
               <Button onClick={() => navigate({ to: "/dashboard" })} className="gap-2">
                 Open dashboard <ArrowRight className="h-4 w-4" />
@@ -215,6 +221,46 @@ function Landing() {
           </div>
         </section>
 
+        {/* ---- What you can build ---- */}
+        <section id="gallery" className="mx-auto max-w-5xl px-6 pb-24">
+          <SectionHeading
+            eyebrow="Endless possibilities"
+            title="What will you build today?"
+            subtitle="Landing pages, dashboards, tools, games — pick a starting point or describe your own."
+          />
+          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {GALLERY.map((item) => (
+              <button
+                key={item.title}
+                type="button"
+                onClick={() => {
+                  setPrompt(item.prompt);
+                  startBuilding();
+                }}
+                className="group overflow-hidden rounded-2xl border border-white/60 bg-white/60 text-left shadow-soft backdrop-blur transition-all hover:-translate-y-0.5 hover:border-white"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-2 p-4">
+                  <div className="min-w-0">
+                    <h3 className="truncate font-medium tracking-tight">{item.title}</h3>
+                    <p className={`truncate text-sm ${MUTED}`}>{item.desc}</p>
+                  </div>
+                  <ArrowUpRight
+                    className={`h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${ACCENT}`}
+                  />
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* ---- Closing CTA ---- */}
         <section className="mx-auto max-w-5xl px-6 pb-24">
           <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/60 px-6 py-16 text-center shadow-soft backdrop-blur">
@@ -247,6 +293,9 @@ function Landing() {
             </a>
             <a href="#how" className="transition-colors hover:text-[oklch(0.22_0.03_280)]">
               How it works
+            </a>
+            <a href="#gallery" className="transition-colors hover:text-[oklch(0.22_0.03_280)]">
+              Examples
             </a>
             <Link to="/auth" className="transition-colors hover:text-[oklch(0.22_0.03_280)]">
               Sign in
@@ -365,6 +414,54 @@ const SUGGESTIONS = [
   "A SaaS dashboard with charts",
   "A todo app with dark mode",
   "A portfolio site",
+];
+
+const GALLERY = [
+  {
+    title: "Marketing site",
+    desc: "Hero, features, pricing & CTA",
+    prompt:
+      "Build a modern marketing landing page with a hero, feature grid, pricing, and a call to action.",
+    image:
+      "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    title: "Analytics dashboard",
+    desc: "Charts, stats & a sidebar",
+    prompt: "Build a SaaS analytics dashboard with a sidebar, KPI stat cards, and a few charts.",
+    image:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    title: "Online store",
+    desc: "Product grid & cart",
+    prompt:
+      "Build an e-commerce storefront with a product grid, product detail view, and a shopping cart.",
+    image:
+      "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    title: "Recipe app",
+    desc: "Search, filters & details",
+    prompt: "Build a recipe app with search, category filters, and a detailed recipe view.",
+    image:
+      "https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    title: "Portfolio",
+    desc: "Showcase your work",
+    prompt:
+      "Build a sleek personal portfolio site with an about section, a project gallery, and contact links.",
+    image:
+      "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    title: "Browser game",
+    desc: "Canvas & game loop",
+    prompt: "Build a simple, fun browser game on a canvas with a score and increasing difficulty.",
+    image:
+      "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80",
+  },
 ];
 
 const STEPS = [

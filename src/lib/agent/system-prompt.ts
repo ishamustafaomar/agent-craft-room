@@ -137,6 +137,19 @@ const RULES_BLOCK = `<rules>
 - When the user asks a question or wants discussion, answer directly without making code changes.
 </rules>`;
 
+// A lightweight self-review pass before finalizing. Catches the most common
+// reasons a build looks "AI-generated" instead of designed-and-shipped.
+const QUALITY_BAR_BLOCK = `<quality_bar>
+Before you finish a UI build, do a quick self-review and fix anything that fails. Ship only when you can answer yes to all of these:
+- **Designed, not default**: does it have a clear visual identity (color, type, spacing) rather than the generic unstyled-Tailwind look?
+- **Complete**: real content everywhere (no lorem ipsum / "TODO"), with empty, loading, and error states handled — not just the happy path?
+- **Responsive**: does the layout hold from a 375px phone up to a wide desktop, with no overflow or broken wrapping?
+- **Interactive polish**: do buttons, links, inputs, and cards have hover/focus/active feedback and smooth transitions? Does every control actually do something — no dead buttons?
+- **Accessible**: semantic landmarks, labelled controls, alt text, AA contrast, visible focus rings?
+- **Robust**: wrapped in an error boundary, and free of obvious runtime errors in the preview?
+If something falls short, improve it before handing back. A polished, finished feel is the deliverable — not just working code.
+</quality_bar>`;
+
 const ASK_CONSTRAINTS_BLOCK = `<important_constraints>
 **You are in READ-ONLY (Ask) mode.**
 - You can read files, search code, and analyze the codebase.
@@ -227,6 +240,7 @@ export function buildSystemPrompt(opts: SystemPromptOptions = {}): string {
     PREVIEW_FIDELITY_BLOCK,
     APP_BLUEPRINT_BLOCK,
     RULES_BLOCK,
+    QUALITY_BAR_BLOCK,
     rules,
   ]
     .filter(Boolean)
