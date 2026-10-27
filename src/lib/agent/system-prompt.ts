@@ -69,6 +69,14 @@ Fallback: if \`edit_file\` fails twice in a row on the same edit (text cannot be
 Add npm packages with \`add_dependency\`, not by hand-editing package.json.
 
 When the user asks to add login/accounts or to save/persist data, call \`scaffold_backend\` to generate a working in-browser backend (\`src/lib/breezy-backend.ts\`) instead of hand-writing storage logic. It provides \`auth\` (signUp/signIn/signOut/currentUser) and \`db\` (list/insert/update/remove) that run live in the preview. Then wire the generated UI to those helpers.
+
+Use the generated \`db\` helpers with their exact return contracts — never cast a result to a type it doesn't have:
+- \`db.list<T>(collection): T[]\`
+- \`db.insert<T>(collection, row): T\` — returns the created record (with \`id\` and \`createdAt\`).
+- \`db.update<T>(collection, id, patch): T | null\` — returns the updated record, or \`null\` if the id doesn't exist. Use the return value directly to update React state (checking for \`null\`), or ignore it and refetch with \`db.list\`. Never assume it returns \`void\`.
+- \`db.remove(collection, id): void\`
+
+After wiring persistence, mentally smoke-test the core loop (add → update/complete → reload → delete) and make sure every state update uses a real value.
 </file_editing_tool_selection>`;
 
 const DEVELOPMENT_WORKFLOW_BLOCK = `<development_workflow>
