@@ -9,21 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
-import { Route as BlogHowToBuildWebAppWithAiRouteImport } from './routes/blog.how-to-build-web-app-with-ai'
-import { Route as AppSlugRouteImport } from './routes/app.$slug'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as ApiGithubPushRouteImport } from './routes/api/github/push'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AppSlugRouteImport } from './routes/app.$slug'
+import { Route as BlogHowToBuildWebAppWithAiRouteImport } from './routes/blog.how-to-build-web-app-with-ai'
+import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
 import { Route as AuthenticatedProjectProjectIdRouteImport } from './routes/_authenticated/project.$projectId'
+import { Route as ApiGithubPushRouteImport } from './routes/api/github/push'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -31,18 +35,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PProjectIdRoute = PProjectIdRouteImport.update({
-  id: '/p/$projectId',
-  path: '/p/$projectId',
+const AppSlugRoute = AppSlugRouteImport.update({
+  id: '/app/$slug',
+  path: '/app/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogHowToBuildWebAppWithAiRoute =
@@ -51,24 +61,9 @@ const BlogHowToBuildWebAppWithAiRoute =
     path: '/blog/how-to-build-web-app-with-ai',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AppSlugRoute = AppSlugRouteImport.update({
-  id: '/app/$slug',
-  path: '/app/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const ApiGithubPushRoute = ApiGithubPushRouteImport.update({
-  id: '/api/github/push',
-  path: '/api/github/push',
+const PProjectIdRoute = PProjectIdRouteImport.update({
+  id: '/p/$projectId',
+  path: '/p/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProjectProjectIdRoute =
@@ -77,6 +72,11 @@ const AuthenticatedProjectProjectIdRoute =
     path: '/project/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiGithubPushRoute = ApiGithubPushRouteImport.update({
+  id: '/api/github/push',
+  path: '/api/github/push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -170,18 +170,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -191,39 +184,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/p/$projectId': {
-      id: '/p/$projectId'
-      path: '/p/$projectId'
-      fullPath: '/p/$projectId'
-      preLoaderRoute: typeof PProjectIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/how-to-build-web-app-with-ai': {
-      id: '/blog/how-to-build-web-app-with-ai'
-      path: '/blog/how-to-build-web-app-with-ai'
-      fullPath: '/blog/how-to-build-web-app-with-ai'
-      preLoaderRoute: typeof BlogHowToBuildWebAppWithAiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/$slug': {
-      id: '/app/$slug'
-      path: '/app/$slug'
-      fullPath: '/app/$slug'
-      preLoaderRoute: typeof AppSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -233,11 +205,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/github/push': {
-      id: '/api/github/push'
-      path: '/api/github/push'
-      fullPath: '/api/github/push'
-      preLoaderRoute: typeof ApiGithubPushRouteImport
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/$slug': {
+      id: '/app/$slug'
+      path: '/app/$slug'
+      fullPath: '/app/$slug'
+      preLoaderRoute: typeof AppSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/how-to-build-web-app-with-ai': {
+      id: '/blog/how-to-build-web-app-with-ai'
+      path: '/blog/how-to-build-web-app-with-ai'
+      fullPath: '/blog/how-to-build-web-app-with-ai'
+      preLoaderRoute: typeof BlogHowToBuildWebAppWithAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$projectId': {
+      id: '/p/$projectId'
+      path: '/p/$projectId'
+      fullPath: '/p/$projectId'
+      preLoaderRoute: typeof PProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/project/$projectId': {
@@ -246,6 +239,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$projectId'
       preLoaderRoute: typeof AuthenticatedProjectProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/github/push': {
+      id: '/api/github/push'
+      path: '/api/github/push'
+      fullPath: '/api/github/push'
+      preLoaderRoute: typeof ApiGithubPushRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
