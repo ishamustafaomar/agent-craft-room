@@ -201,7 +201,7 @@ export async function executeAgentTool(
             ? "auth.signUp(email,password), auth.signIn(email,password), auth.signOut(), auth.currentUser(). "
             : "") +
           (features.includes("database")
-            ? "db.list(collection), db.insert(collection,row), db.update(collection,id,patch), db.remove(collection,id)."
+            ? "db.list(collection), db.insert(collection,row) -> row, db.update(collection,id,patch) -> updated row or null, db.remove(collection,id)."
             : ""),
       };
     }
@@ -255,9 +255,17 @@ function buildBackendModule(features: string[]): string {
       "    write(`breezy:db:${collection}`, [record, ...items]);",
       "    return record;",
       "  },",
-      "  update<T extends Row = Row>(collection: string, id: string, patch: Partial<T>): void {",
-      "    const items = db.list<T>(collection).map((it) => (it.id === id ? { ...it, ...patch } : it));",
+      "  // Returns the updated record, or null if no row with that id exists. Callers",
+      "  // can set React state directly from the result — no refetch or cast needed.",
+      "  update<T extends Row = Row>(collection: string, id: string, patch: Partial<T>): T | null {",
+      "    let updated: T | null = null;",
+      "    const items = db.list<T>(collection).map((it) => {",
+      "      if (it.id !== id) return it;",
+      "      updated = { ...it, ...patch };",
+      "      return updated;",
+      "    });",
       "    write(`breezy:db:${collection}`, items);",
+      "    return updated;",
       "  },",
       "  remove(collection: string, id: string): void {",
       "    write(`breezy:db:${collection}`, db.list(collection).filter((it) => it.id !== id));",
